@@ -133,7 +133,7 @@ const Login = ({ isDarkMode, setDarkMode, color, setColor, broken }) => {
                 color: color
               }}
             >
-              Transact
+              Auto Hub
             </Typography.Title>
           </div>
           <div
