@@ -1,0 +1,174 @@
+@font-face {
+  font-family: 'regular-en';
+  src: url(../fonts/en/Roboto-Regular.ttf) format('truetype');
+  font-display: block;
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'bold-en';
+  src: url(../fonts/en/Roboto-Bold.ttf) format('truetype');
+  font-display: block;
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'regular-ar-kr';
+  src: url(../fonts/ar-kr/Vazirmatn-VariableFont.ttf) format('truetype');
+  font-display: block;
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'bold-ar-kr';
+  src: url(../fonts/ar-kr/Vazirmatn-VariableFont.ttf) format('truetype');
+  font-display: block;
+  font-weight: bold;
+  font-style: normal;
+}
+
+//remove scrollbars
+::-webkit-scrollbar {
+  display: none;
+}
+
+:root {
+  --main-color: #dd283b;
+  --light-bg: #FFFFFF;
+  --dark-bg: #141414;
+  --regular: 'regular-en';
+  --bold: 'bold-en';
+  overflow-x: hidden;
+
+  :lang(ar),
+  :lang(ku) {
+    --regular: 'regular-ar-kr';
+    --bold: 'bold-ar-kr';
+  }
+}
+
+/* Box sizing rules */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: var(--regular), serif;
+  -webkit-tap-highlight-color: transparent !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+*:focus {
+  outline: none;
+}
+
+.dark {
+  --light-bg: #FFFFFF;
+  --dark-bg: #141414;
+}
+
+.light {
+  --light-bg: #FFFFFF;
+  --dark-bg: #141414;
+}
+
+body {
+  font-family: var(--regular), serif !important;
+  cursor: default;
+}
+
+* {
+  font-family: var(--regular), serif !important;
+}
+
+strong, b, h1, h2, h3, h4, h5, h6 {
+  font-family: var(--bold), serif !important;
+}
+
+/* Remove default margin */
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
+}
+
+/* Set core root defaults */
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+/* Set core body defaults */
+body {
+  text-rendering: optimizeLegibility;
+  line-height: 1.5;
+  width: 100% !important;
+}
+
+/* A elements that don't have a class get default styles */
+a:not([class]) {
+  text-decoration-skip-ink: auto;
+}
+
+/* Make images easier to work with */
+img,
+picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Inherit fonts for inputs and buttons */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+.layoutStyle {
+  overflow: hidden;
+  width: 100%;
+  height: 100dvh;
+}
+
+.full-width-tabs .ant-tabs-nav .ant-tabs-nav-list {
+  width: 100%;
+}
+
+.full-width-tabs .ant-tabs-tab {
+  flex: 1 !important;
+  display: flex;
+  justify-content: center;
+  margin-right: 0 !important;
+}
+
+.ant-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ant-drawer {
+  z-index: 998;
+}
+
+.ant-table {
+  border-radius: 0 !important;
+}
+
