@@ -1,7 +1,8 @@
-import { CloseOutlined } from '@ant-design/icons';
-import { Menu, Layout } from 'antd';
+// SiderComponent.jsx
+import { CloseOutlined, GlobalOutlined } from '@ant-design/icons';
+import { Menu, Layout, Button, Dropdown } from 'antd';
 import routes from '../../routes.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { darkBackground, whiteBackground } from '../../configs/constants.js';
 
@@ -17,6 +18,8 @@ const SiderComponent = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+
   return (
     <Sider
       collapsed={collapsed}
@@ -117,7 +120,7 @@ const SiderComponent = ({
             return {
               key: item.key,
               icon: item.icon,
-              label: item.label,
+              label: t(item.label),
               onClick: (e) => {
                 setCollapsed(true);
                 const route = routes.find(
