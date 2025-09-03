@@ -1,4 +1,3 @@
-// SiderComponent.jsx
 import { CloseOutlined, GlobalOutlined } from '@ant-design/icons';
 import { Menu, Layout, Button, Dropdown } from 'antd';
 import routes from '../../routes.jsx';
