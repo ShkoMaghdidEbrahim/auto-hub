@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { supabase } from '../database/supabase.js';
 import { useTranslation } from 'react-i18next';
 import SettingsDrawer from '../components/App/SettingsDrawer.jsx';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = ({ isDarkMode, setDarkMode, color, setColor, broken }) => {
   const { t } = useTranslation();
@@ -35,15 +36,23 @@ const Login = ({ isDarkMode, setDarkMode, color, setColor, broken }) => {
         password: values.password
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      const { user, session } = data;
+      const token = data.session?.access_token;
+      let user = data.user;
+
+      if (token) {
+        const decoded = jwtDecode(token);
+        user = {
+          ...user,
+          roles: decoded.roles,
+          permissions: decoded.permissions
+        };
+      }
 
       setAuth({
         user: user,
-        token: session.access_token
+        token: token
       });
 
       navigate('/');
