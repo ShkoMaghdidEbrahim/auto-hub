@@ -4,6 +4,7 @@ import routes from '../../routes.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { darkBackground, whiteBackground } from '../../configs/constants.js';
+import { makeDeeper } from '../../configs/makeDeeper.js';
 
 const { Sider } = Layout;
 
@@ -38,25 +39,20 @@ const SiderComponent = ({
           ? isDarkMode
             ? '1px solid #414141'
             : '1px solid #d3d3d3'
-          : 'none',
-        paddingLeft: collapsed ? 0 : 10,
-        paddingRight: collapsed ? 0 : 10
+          : 'none'
       }}
     >
       <div
         style={{
-          height: 50,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           color: 'white',
-          marginBottom: 10,
-          marginTop: 10,
-          marginLeft: 4,
-          marginRight: 4,
+          height: 63,
           fontSize: 20,
           fontWeight: 'bold',
-          gap: 5
+          gap: 5,
+          marginBottom: 5
         }}
       >
         {broken ? (
@@ -88,48 +84,60 @@ const SiderComponent = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: color,
-            borderRadius: borderRadiusLG + 2
+            outline: broken
+              ? 'none'
+              : isDarkMode
+                ? '1px solid #414141'
+                : '1px solid #d3d3d3'
           }}
         >
-          {t('menu')}
+          <img
+            src={'/logo.png'}
+            alt="Logo"
+            style={{
+              height: 50,
+              objectFit: 'contain'
+            }}
+          />
         </div>
       </div>
 
-      <Menu
-        mode="inline"
-        style={{
-          backgroundColor: isDarkMode ? darkBackground : whiteBackground,
-          fontSize: 15,
-          height: '85%',
-          width: '100%',
-          borderRadius: 0,
-          border: 'none',
-          overflowX: 'hidden',
-          overflowY: 'auto'
-        }}
-        defaultSelectedKeys={[
-          routes
-            .find((route) => route?.path === location?.pathname)
-            ?.key?.toString()
-        ]}
-        items={routes
-          .filter((route) => route.show)
-          .map((item) => {
-            return {
-              key: item.key,
-              icon: item.icon,
-              label: t(item.label),
-              onClick: (e) => {
-                setCollapsed(true);
-                const route = routes.find(
-                  (ro) => ro.key.toString() === e.key.toString()
-                );
-                navigate(route.path);
-              }
-            };
-          })}
-      />
+      <div style={{}}>
+        <Menu
+          mode="inline"
+          style={{
+            backgroundColor: isDarkMode ? darkBackground : whiteBackground,
+            fontSize: 15,
+            height: '85%',
+            width: '100%',
+            borderRadius: 0,
+            border: 'none',
+            overflowX: 'hidden',
+            overflowY: 'auto'
+          }}
+          defaultSelectedKeys={[
+            routes
+              .find((route) => route?.path === location?.pathname)
+              ?.key?.toString()
+          ]}
+          items={routes
+            .filter((route) => route.show)
+            .map((item) => {
+              return {
+                key: item.key,
+                icon: item.icon,
+                label: t(item.label),
+                onClick: (e) => {
+                  setCollapsed(true);
+                  const route = routes.find(
+                    (ro) => ro.key.toString() === e.key.toString()
+                  );
+                  navigate(route.path);
+                }
+              };
+            })}
+        />
+      </div>
     </Sider>
   );
 };
