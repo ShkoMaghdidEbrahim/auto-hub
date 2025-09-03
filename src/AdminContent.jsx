@@ -1,9 +1,8 @@
-import { Layout, theme } from 'antd';
+import { Button, Layout, theme } from 'antd';
 import './assets/styles/global.scss';
 import { Route, Routes } from 'react-router-dom';
 import { Suspense, useState } from 'react';
 import routes from './routes.jsx';
-import { LoadingOutlined } from '@ant-design/icons';
 import useLocalStorage from './database/useLocalStorage.js';
 import {
   darkBackground,
@@ -14,51 +13,8 @@ import Login from './pages/Login.jsx';
 import useBackGesture from './configs/useBackGesture.js';
 import SiderComponent from './components/Layout/SiderComponent.jsx';
 import HeaderComponent from './components/Layout/HeaderComponent.jsx';
-import { useTranslation } from 'react-i18next';
+import LoadingFallback from './components/App/LoadingFallback.jsx';
 const { Content } = Layout;
-
-function LoadingFallback() {
-  const { t } = useTranslation();
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        transition: 'opacity 0.5s ease-in-out',
-        opacity: 1
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-          gap: 40
-        }}
-      >
-        <LoadingOutlined
-          style={{
-            fontSize: 100,
-            display: 'block',
-            margin: 'auto'
-          }}
-        />
-        <p
-          style={{
-            fontSize: 25,
-            fontWeight: 'bold'
-          }}
-        >
-          {t('loading')}
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
   const {
@@ -67,6 +23,11 @@ function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
 
   const [collapsed, setCollapsed] = useState(true);
   const [auth, setAuth] = useLocalStorage(localStorageName, null);
+
+  const routesWithPermissions = routes.filter((route) => {
+    if (!auth || !auth.user || !auth.user.permissions) return false;
+    return auth.user.permissions.includes(route.permission);
+  });
 
   useBackGesture(
     () => {
@@ -82,10 +43,7 @@ function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
 
   return (
     <>
-      <Layout
-        className={'layoutStyle'}
-        hasSider={true}
-      >
+      <Layout className={'layoutStyle'} hasSider={true}>
         <SiderComponent
           collapsed={collapsed}
           setCollapsed={setCollapsed}
@@ -122,7 +80,7 @@ function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
             }}
           >
             <Routes>
-              {routes.map((route) => {
+              {routesWithPermissions.map((route) => {
                 return (
                   <Route
                     path={route.path}
@@ -135,6 +93,64 @@ function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
                   />
                 );
               })}
+              <Route
+                path="*"
+                element={
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexDirection: 'column',
+                      height: '100%',
+                      fontSize: 24,
+                      fontWeight: 'bold',
+                      color: isDarkMode ? 'white' : 'black'
+                    }}
+                  >
+                    <img
+                      src="/404.png"
+                      alt="404"
+                      style={{
+                        width: '75%',
+                        height: '75%',
+                        objectFit: 'contain'
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'relative',
+                        height: '25%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        gap: 20
+                      }}
+                    >
+                      <p
+                        style={{
+                          fontSize: 40,
+                          color: isDarkMode ? 'white' : 'black'
+                        }}
+                      >
+                        Page Not Found
+                      </p>
+
+                      <Button
+                        type="primary"
+                        size={'large'}
+                        onClick={() => {
+                          window.location.href = '/';
+                        }}
+                        block
+                      >
+                        Go Home
+                      </Button>
+                    </div>
+                  </div>
+                }
+              />
             </Routes>
           </Content>
         </Layout>

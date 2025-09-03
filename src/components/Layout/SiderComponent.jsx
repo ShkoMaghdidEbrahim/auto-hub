@@ -3,8 +3,13 @@ import { Menu, Layout, Button, Dropdown } from 'antd';
 import routes from '../../routes.jsx';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { darkBackground, whiteBackground } from '../../configs/constants.js';
+import {
+  darkBackground,
+  localStorageName,
+  whiteBackground
+} from '../../configs/constants.js';
 import { makeDeeper } from '../../configs/makeDeeper.js';
+import useLocalStorage from '../../database/useLocalStorage.js';
 
 const { Sider } = Layout;
 
@@ -19,6 +24,14 @@ const SiderComponent = ({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [auth] = useLocalStorage(localStorageName, null);
+
+  const cleanedRoutes = routes.filter((route) => route.show !== false);
+  const routesWithPermissions = cleanedRoutes.filter((route) => {
+    if (!auth || !auth.user || !auth.user.permissions) return false;
+    return auth.user.permissions.includes(route.permission);
+  });
 
   return (
     <Sider
@@ -120,7 +133,7 @@ const SiderComponent = ({
               .find((route) => route?.path === location?.pathname)
               ?.key?.toString()
           ]}
-          items={routes
+          items={routesWithPermissions
             .filter((route) => route.show)
             .map((item) => {
               return {
