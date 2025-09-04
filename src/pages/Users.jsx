@@ -251,7 +251,12 @@ const Users = () => {
                 .then(() => {
                   setLoading(true);
                   getRoles()
-                    .then((data) => setRoles(data))
+                    .then((data) => {
+                      getUsers().then((users) => {
+                        setUsers(users);
+                        setRoles(data);
+                      });
+                    })
                     .catch((error) =>
                       console.error('Error fetching users:', error)
                     )
