@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Divider, Row, Space, Table, Tag } from 'antd';
-import { getPermissions, getRoles, getUsers } from '../database/UsersApi.js';
+import {
+  deleteUser,
+  getPermissions,
+  getRoles,
+  getUsers
+} from '../database/UsersApi.js';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import AddAndUpdateUsersModal from '../components/Users/AddAndUpdateUsersModal.jsx';
@@ -50,6 +55,8 @@ const Users = () => {
       render: (_, record) => (
         <Space>
           <Button
+            loading={loading}
+            disabled={loading}
             shape={'round'}
             type="default"
             icon={<EditOutlined />}
@@ -64,9 +71,21 @@ const Users = () => {
             shape={'round'}
             type="default"
             danger
+            loading={loading}
+            disabled={loading}
             icon={<DeleteOutlined />}
             onClick={() =>
-              setAddAndUpdateUserModal({ open: true, user: record })
+              deleteUser(record.id)
+                .then(() => {
+                  setLoading(true);
+                  getUsers()
+                    .then((data) => setUsers(data))
+                    .catch((error) =>
+                      console.error('Error fetching users:', error)
+                    )
+                    .finally(() => setLoading(false));
+                })
+                .catch((error) => console.error('Error deleting user:', error))
             }
           >
             {t('delete')}

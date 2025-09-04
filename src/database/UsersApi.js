@@ -196,3 +196,11 @@ export const updateUser = async (userId, email, password, roleId) => {
 
   return data;
 };
+
+export const deleteUser = async (userId) => {
+  const { error } = await supabase.auth.admin.deleteUser(userId);
+  if (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};
