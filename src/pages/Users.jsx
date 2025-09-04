@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Divider, Row, Space, Table, Tag } from 'antd';
 import {
+  deleteRole,
   deleteUser,
   getPermissions,
   getRoles,
@@ -10,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import AddAndUpdateUsersModal from '../components/Users/AddAndUpdateUsersModal.jsx';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import AddAndUpdateRoleModal from '../components/Users/AddAndUpdateRoleModal.jsx';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -19,6 +21,11 @@ const Users = () => {
   const [addAndUpdateUserModal, setAddAndUpdateUserModal] = useState({
     open: false,
     user: null
+  });
+
+  const [addAndUpdateRoleModal, setAddAndUpdateRoleModal] = useState({
+    open: false,
+    role: null
   });
 
   const [loading, setLoading] = useState(true);
@@ -149,16 +156,62 @@ const Users = () => {
           </div>
         );
       }
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 250,
+      align: 'center',
+      render: (_, record) => (
+        <Space>
+          <Button
+            loading={loading}
+            disabled={loading}
+            shape={'round'}
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() =>
+              setAddAndUpdateRoleModal({ open: true, role: record })
+            }
+          >
+            {t('edit')}
+          </Button>
+
+          <Button
+            shape={'round'}
+            type="default"
+            danger
+            loading={loading}
+            disabled={loading}
+            icon={<DeleteOutlined />}
+            onClick={() =>
+              deleteRole(record.id)
+                .then(() => {
+                  setLoading(true);
+                  getRoles()
+                    .then((data) => setRoles(data))
+                    .catch((error) =>
+                      console.error('Error fetching users:', error)
+                    )
+                    .finally(() => setLoading(false));
+                })
+                .catch((error) => console.error('Error deleting user:', error))
+            }
+          >
+            {t('delete')}
+          </Button>
+        </Space>
+      )
     }
   ];
 
   useEffect(() => {
     getUsers()
       .then((data) => {
-        setUsers(data);
         getRoles().then((roles) => {
-          setRoles(roles);
           getPermissions().then((permissions) => {
+            setUsers(data);
+            setRoles(roles);
             setPermissions(permissions);
           });
         });
@@ -235,7 +288,7 @@ const Users = () => {
                 block
                 type="primary"
                 onClick={() =>
-                  setAddAndUpdateUserModal({ open: true, user: null })
+                  setAddAndUpdateRoleModal({ open: true, role: null })
                 }
               >
                 {t('add_role')}
@@ -308,6 +361,22 @@ const Users = () => {
           }}
           user={addAndUpdateUserModal.user}
           roles={roles}
+        />
+      ) : null}
+
+      {addAndUpdateRoleModal?.open ? (
+        <AddAndUpdateRoleModal
+          open={addAndUpdateRoleModal.open}
+          onClose={() => setAddAndUpdateRoleModal({ open: false, role: null })}
+          onDone={() => {
+            setLoading(true);
+            getRoles()
+              .then((data) => setRoles(data))
+              .catch((error) => console.error('Error fetching roles:', error))
+              .finally(() => setLoading(false));
+          }}
+          role={addAndUpdateRoleModal.role}
+          permissions={permissions}
         />
       ) : null}
     </Card>

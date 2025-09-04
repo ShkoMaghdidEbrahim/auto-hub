@@ -490,5 +490,12 @@
   "error_creating_user": "هەڵە لە دروستکردنی بەکارهێنەردا",
   "error_updating_user": "هەڵە لە نوێکردنەوەی بەکارهێنەردا",
   "actions": "کردارەکان",
-  "update_user": "نوێکردنەوەی بەکارهێنەر"
+  "update_user": "نوێکردنەوەی بەکارهێنەر",
+  "error_creating_role": "هەڵە لە دروستکردنی ڕۆڵدا",
+  "error_updating_role": "هەڵە لە نوێکردنەوەی ڕۆڵدا",
+  "error_deleting_role": "هەڵە لە سڕینەوەی ڕۆڵدا",
+  "error_creating_permission": "هەڵە لە دروستکردنی دەسەڵاتدا",
+  "error_updating_permission": "هەڵە لە نوێکردنەوەی دەسەڵاتدا",
+  "error_deleting_permission": "هەڵە لە سڕینەوەی دەسەڵاتدا",
+  "update_role": "نوێکردنەوەی ڕۆڵ"
 }

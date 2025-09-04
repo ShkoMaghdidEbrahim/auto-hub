@@ -490,5 +490,12 @@
   "add_permission": "Add Permission",
   "add_role": "Add Role",
   "actions": "Actions",
-  "update_user": "Update User"
+  "update_user": "Update User",
+  "error_creating_role": "Error creating role",
+  "error_updating_role": "Error updating role",
+  "error_deleting_role": "Error deleting role",
+  "error_creating_permission": "Error creating permission",
+  "error_updating_permission": "Error updating permission",
+  "error_deleting_permission": "Error deleting permission",
+  "update_role": "Update Role"
 }

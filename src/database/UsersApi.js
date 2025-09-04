@@ -204,3 +204,103 @@ export const deleteUser = async (userId) => {
     throw error;
   }
 };
+
+export const createRole = async (name, description, permissionIds) => {
+  console.log({
+    name,
+    description,
+    permissionIds
+  });
+  const { data: role, error: roleError } = await supabase
+    .from('roles')
+    .insert([{ name, description }])
+    .select()
+    .single();
+
+  if (roleError) {
+    console.error('Error creating role:', roleError);
+    throw roleError;
+  }
+
+  if (permissionIds && permissionIds.length > 0) {
+    const rolePermissions = permissionIds.map((pid) => ({
+      role_id: role.id,
+      permission_id: pid
+    }));
+
+    const { error: permissionsError } = await supabase
+      .from('role_permissions')
+      .insert(rolePermissions);
+
+    if (permissionsError) {
+      console.error('Error assigning permissions to role:', permissionsError);
+      throw permissionsError;
+    }
+  }
+
+  return role;
+};
+
+export const updateRole = async (roleId, name, description, permissionIds) => {
+  const { error: roleError } = await supabase
+    .from('roles')
+    .update({ name, description })
+    .eq('id', roleId);
+
+  if (roleError) {
+    console.error('Error updating role:', roleError);
+    throw roleError;
+  }
+
+  const { error: deleteError } = await supabase
+    .from('role_permissions')
+    .delete()
+    .eq('role_id', roleId);
+
+  if (deleteError) {
+    console.error('Error clearing existing permissions:', deleteError);
+    throw deleteError;
+  }
+
+  if (permissionIds && permissionIds.length > 0) {
+    const rolePermissions = permissionIds.map((pid) => ({
+      role_id: roleId,
+      permission_id: pid
+    }));
+
+    const { error: permissionsError } = await supabase
+      .from('role_permissions')
+      .insert(rolePermissions);
+
+    if (permissionsError) {
+      console.error('Error assigning permissions to role:', permissionsError);
+      throw permissionsError;
+    }
+  }
+
+  return true;
+};
+
+export const deleteRole = async (roleId) => {
+  const { error: deletePermissionsError } = await supabase
+    .from('role_permissions')
+    .delete()
+    .eq('role_id', roleId);
+
+  if (deletePermissionsError) {
+    console.error('Error deleting role permissions:', deletePermissionsError);
+    throw deletePermissionsError;
+  }
+
+  const { error: deleteRoleError } = await supabase
+    .from('roles')
+    .delete()
+    .eq('id', roleId);
+
+  if (deleteRoleError) {
+    console.error('Error deleting role:', deleteRoleError);
+    throw deleteRoleError;
+  }
+
+  return true;
+};
