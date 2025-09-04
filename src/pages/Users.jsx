@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table } from 'antd';
+import { Card, Table, Tag } from 'antd';
 import { getUsers } from '../database/UsersApi.js';
 
 const Users = () => {
@@ -14,9 +14,52 @@ const Users = () => {
     },
     {
       title: 'Role',
-      dataIndex: 'user_roles',
-      key: 'user_roles',
-      render: (roles) => roles.map((r) => r?.roles['name']).join(', ')
+      dataIndex: 'user_role',
+      key: 'user_role',
+      render: (roles) => {
+        if (!roles || !Array.isArray(roles)) return '-';
+        return roles
+          .map((role) => role?.name || role?.role?.name || '-')
+          .join(', ');
+      }
+    },
+    {
+      title: 'Permissions',
+      dataIndex: 'permissions',
+      key: 'permissions',
+      render: (_, record) => {
+        const permissions = record.user_role
+          ? record.user_role.flatMap((role) =>
+              role?.permissions ? role.permissions.map((perm) => perm.name) : []
+            )
+          : [];
+        const uniquePermissions = [...new Set(permissions)];
+        return uniquePermissions.length > 0 ? (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '4px'
+            }}
+          >
+            {uniquePermissions.map((permission) => (
+              <Tag
+                key={permission}
+                style={{
+                  padding: '2px 8px',
+                  borderRadius: '4px',
+                  margin: '0 4px 4px 0',
+                  display: 'inline-block'
+                }}
+              >
+                {permission}
+              </Tag>
+            ))}
+          </div>
+        ) : (
+          '-'
+        );
+      }
     },
     {
       title: 'Created At',
@@ -45,7 +88,14 @@ const Users = () => {
       variant={'borderless'}
       key={'dashboard'}
     >
-      <Table loading={loading} columns={columns} dataSource={users} />
+      <Table
+        loading={loading}
+        columns={columns}
+        dataSource={users}
+        scroll={{
+          x: 'max-content'
+        }}
+      />
     </Card>
   );
 };

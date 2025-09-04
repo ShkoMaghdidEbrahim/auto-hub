@@ -45,7 +45,7 @@ const Login = ({ isDarkMode, setDarkMode, color, setColor, broken }) => {
         const decoded = jwtDecode(token);
         user = {
           ...user,
-          roles: decoded.roles,
+          user_role: decoded.user_role,
           permissions: decoded.permissions
         };
       }

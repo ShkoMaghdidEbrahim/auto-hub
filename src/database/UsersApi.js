@@ -13,17 +13,17 @@ export const getUsers = async () => {
 
   if (userIds.length === 0) return [];
 
-  const { data: rolesData, error: rolesError } = await supabase
+  const { data: userRoles, error: rolesError } = await supabase
     .from('user_roles')
     .select(
       `
-    user_id,
-    roles:role_id (
-      id,
-      name,
-      description
-    )
-  `
+      user_id,
+      role_id (
+        id,
+        name,
+        description
+      )
+    `
     )
     .in('user_id', userIds);
 
@@ -32,15 +32,52 @@ export const getUsers = async () => {
     throw rolesError;
   }
 
+  const uniqueRoleIds = [...new Set(userRoles.map((role) => role.role_id.id))];
+
+  const { data: permissionsData, error: permissionsError } = await supabase
+    .from('role_permissions')
+    .select(
+      `
+    role_id,
+    permission_id (
+      id,
+      name,
+      description
+    )
+  `
+    )
+    .in('role_id', uniqueRoleIds);
+
+  if (permissionsError) {
+    console.error('Error fetching permissions:', permissionsError);
+    throw permissionsError;
+  }
+
   const rolesMap = {};
-  rolesData.forEach(({ user_id, roles }) => {
+  userRoles.forEach(({ user_id, role_id }) => {
     if (!rolesMap[user_id]) {
       rolesMap[user_id] = [];
     }
-    rolesMap[user_id].push({ roles });
+    rolesMap[user_id].push(role_id);
   });
-  return users.map((user) => ({
-    ...user,
-    user_roles: rolesMap[user.id] || []
-  }));
+
+  const permissionsMap = {};
+  permissionsData.forEach(({ role_id, permission_id }) => {
+    if (!permissionsMap[role_id]) {
+      permissionsMap[role_id] = [];
+    }
+    permissionsMap[role_id].push(permission_id);
+  });
+
+  return users.map((user) => {
+    const roles = rolesMap[user.id] || [];
+    const rolesWithPermissions = roles.map((role) => ({
+      ...role,
+      permissions: permissionsMap[role.id] || []
+    }));
+    return {
+      ...user,
+      user_role: rolesWithPermissions
+    };
+  });
 };
