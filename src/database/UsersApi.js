@@ -81,3 +81,59 @@ export const getUsers = async () => {
     };
   });
 };
+
+export const getPermissions = async () => {
+  const { data, error } = await supabase.from('permissions').select('*');
+  if (error) {
+    console.error('Error fetching permissions:', error);
+    throw error;
+  }
+  return data;
+};
+
+export const getRoles = async () => {
+  const { data: roles, error } = await supabase.from('roles').select('*');
+
+  if (error) {
+    console.error('Error fetching roles:', error);
+    throw error;
+  }
+
+  const roleIds = roles.map((role) => role.id);
+
+  if (roleIds.length === 0) return [];
+
+  const { data: rolePermissions, error: permissionsError } = await supabase
+    .from('role_permissions')
+    .select(
+      `
+      role_id,
+      permission_id (
+        id,
+        name,
+        description
+      )
+    `
+    )
+    .in('role_id', roleIds);
+
+  if (permissionsError) {
+    console.error('Error fetching role permissions:', permissionsError);
+    throw permissionsError;
+  }
+
+  // Group permissions by role
+  const permissionsByRole = {};
+  rolePermissions.forEach(({ role_id, permission_id }) => {
+    if (!permissionsByRole[role_id]) {
+      permissionsByRole[role_id] = [];
+    }
+    permissionsByRole[role_id].push(permission_id);
+  });
+
+  // Attach permissions to each role
+  return roles.map((role) => ({
+    ...role,
+    permissions: permissionsByRole[role.id] || []
+  }));
+};
