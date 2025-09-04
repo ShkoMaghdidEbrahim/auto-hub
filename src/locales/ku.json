@@ -481,5 +481,14 @@
   "permission_description_required": "وەسفکردنی دەسەڵات پێویستە",
   "no_permissions_found": "هیچ دەسەڵاتێک نەدۆزرایەوە",
   "permission_details": "وردەکاری دەسەڵات",
-  "email": "ئیمەیڵ"
+  "email": "ئیمەیڵ",
+  "add_user": "بەکارهێنەر زیاد بکە",
+  "add_permission": "دەسەڵات زیاد بکە",
+  "add_role": "ڕۆڵ زیاد بکە",
+  "error_fetching_users": "هەڵە لە وەرگرتنی بەکارهێنەراندا",
+  "error_deleting_user": "هەڵە لە سڕینەوەی بەکارهێنەردا",
+  "error_creating_user": "هەڵە لە دروستکردنی بەکارهێنەردا",
+  "error_updating_user": "هەڵە لە نوێکردنەوەی بەکارهێنەردا",
+  "actions": "کردارەکان",
+  "update_user": "نوێکردنەوەی بەکارهێنەر"
 }

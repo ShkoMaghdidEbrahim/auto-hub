@@ -453,6 +453,10 @@
   "user_created_successfully": "User created successfully",
   "user_updated_successfully": "User updated successfully",
   "user_deleted_successfully": "User deleted successfully",
+  "error_fetching_users": "Error fetching users",
+  "error_deleting_user": "Error deleting user",
+  "error_creating_user": "Error creating user",
+  "error_updating_user": "Error updating user",
   "user_name_required": "User name is required",
   "user_email_required": "User email is required",
   "user_email_invalid": "User email is invalid",
@@ -481,5 +485,10 @@
   "permission_description_required": "Permission description is required",
   "no_permissions_found": "No permissions found",
   "permission_details": "Permission Details",
-  "email": "Email"
+  "email": "Email",
+  "add_user": "Add User",
+  "add_permission": "Add Permission",
+  "add_role": "Add Role",
+  "actions": "Actions",
+  "update_user": "Update User"
 }

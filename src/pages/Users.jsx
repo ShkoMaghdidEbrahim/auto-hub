@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Divider, Row, Table, Tag } from 'antd';
+import { Button, Card, Col, Divider, Row, Space, Table, Tag } from 'antd';
 import { getPermissions, getRoles, getUsers } from '../database/UsersApi.js';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
+import AddAndUpdateUsersModal from '../components/Users/AddAndUpdateUsersModal.jsx';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [permissions, setPermissions] = useState([]);
+
+  const [addAndUpdateUserModal, setAddAndUpdateUserModal] = useState({
+    open: false,
+    user: null
+  });
 
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
@@ -34,6 +41,38 @@ const Users = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss')
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 250,
+      align: 'center',
+      render: (_, record) => (
+        <Space>
+          <Button
+            shape={'round'}
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() =>
+              setAddAndUpdateUserModal({ open: true, user: record })
+            }
+          >
+            {t('edit')}
+          </Button>
+
+          <Button
+            shape={'round'}
+            type="default"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() =>
+              setAddAndUpdateUserModal({ open: true, user: record })
+            }
+          >
+            {t('delete')}
+          </Button>
+        </Space>
+      )
     }
   ];
 
@@ -118,15 +157,34 @@ const Users = () => {
       variant={'borderless'}
       key={'dashboard'}
     >
-      <Row>
-        <Divider
-          orientation={t('rtl') ? 'right' : 'left'}
-          style={{
-            fontSize: 24
-          }}
-        >
-          {t('users')}
-        </Divider>
+      <Row gutter={[10, 16]}>
+        <Col span={24}>
+          <Row gutter={[10, 10]}>
+            <Col span={18}>
+              <Divider
+                orientation={t('rtl') ? 'right' : 'left'}
+                style={{
+                  fontSize: 24,
+                  margin: 0
+                }}
+                dashed={true}
+              >
+                {t('users')}
+              </Divider>
+            </Col>
+            <Col span={6}>
+              <Button
+                block
+                type="primary"
+                onClick={() =>
+                  setAddAndUpdateUserModal({ open: true, user: null })
+                }
+              >
+                {t('add_user')}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
 
         <Col span={24}>
           <Table
@@ -139,14 +197,33 @@ const Users = () => {
           />
         </Col>
 
-        <Divider
-          style={{
-            fontSize: 24
-          }}
-          orientation={t('rtl') ? 'right' : 'left'}
-        >
-          {t('roles')}
-        </Divider>
+        <Col span={24}>
+          <Row gutter={[10, 10]}>
+            <Col span={18}>
+              <Divider
+                orientation={t('rtl') ? 'right' : 'left'}
+                style={{
+                  fontSize: 24,
+                  margin: 0
+                }}
+                dashed={true}
+              >
+                {t('roles')}
+              </Divider>
+            </Col>
+            <Col span={6}>
+              <Button
+                block
+                type="primary"
+                onClick={() =>
+                  setAddAndUpdateUserModal({ open: true, user: null })
+                }
+              >
+                {t('add_role')}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
 
         <Col span={24}>
           <Table
@@ -159,14 +236,33 @@ const Users = () => {
           />
         </Col>
 
-        <Divider
-          style={{
-            fontSize: 24
-          }}
-          orientation={t('rtl') ? 'right' : 'left'}
-        >
-          {t('permissions')}
-        </Divider>
+        <Col span={24}>
+          <Row gutter={[10, 10]}>
+            <Col span={18}>
+              <Divider
+                orientation={t('rtl') ? 'right' : 'left'}
+                style={{
+                  fontSize: 24,
+                  margin: 0
+                }}
+                dashed={true}
+              >
+                {t('permissions')}
+              </Divider>
+            </Col>
+            <Col span={6}>
+              <Button
+                block
+                type="primary"
+                onClick={() =>
+                  setAddAndUpdateUserModal({ open: true, user: null })
+                }
+              >
+                {t('add_permission')}
+              </Button>
+            </Col>
+          </Row>
+        </Col>
 
         <Col span={24}>
           <Table
@@ -179,6 +275,22 @@ const Users = () => {
           />
         </Col>
       </Row>
+
+      {addAndUpdateUserModal?.open ? (
+        <AddAndUpdateUsersModal
+          open={addAndUpdateUserModal.open}
+          onClose={() => setAddAndUpdateUserModal({ open: false, user: null })}
+          onDone={() => {
+            setLoading(true);
+            getUsers()
+              .then((data) => setUsers(data))
+              .catch((error) => console.error('Error fetching users:', error))
+              .finally(() => setLoading(false));
+          }}
+          user={addAndUpdateUserModal.user}
+          roles={roles}
+        />
+      ) : null}
     </Card>
   );
 };

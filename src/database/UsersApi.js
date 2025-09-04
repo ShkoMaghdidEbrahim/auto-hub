@@ -137,3 +137,62 @@ export const getRoles = async () => {
     permissions: permissionsByRole[role.id] || []
   }));
 };
+
+export const addUser = async (email, password, roleId) => {
+  const { data: user, error: signUpError } =
+    await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true
+    });
+
+  if (signUpError) {
+    console.error('Error creating user:', signUpError);
+    throw signUpError;
+  }
+
+  const { error: roleError } = await supabase.from('user_roles').insert([
+    {
+      user_id: user.user.id,
+      role_id: roleId
+    }
+  ]);
+
+  if (roleError) {
+    console.error('Error assigning role to user:', roleError);
+    throw roleError;
+  }
+
+  return user;
+};
+
+export const updateUser = async (userId, email, password, roleId) => {
+  const updates = { id: userId, email };
+  if (password && password?.trim() !== '') {
+    updates.password = password;
+  }
+
+  const { data, error } = await supabase.auth.admin.updateUserById(
+    userId,
+    updates
+  );
+
+  if (error) {
+    console.error('Error updating user:', error);
+    throw error;
+  }
+
+  const { error: roleError } = await supabase.from('user_roles').upsert([
+    {
+      user_id: userId,
+      role_id: roleId
+    }
+  ]);
+
+  if (roleError) {
+    console.error('Error updating user role:', roleError);
+    throw roleError;
+  }
+
+  return data;
+};
