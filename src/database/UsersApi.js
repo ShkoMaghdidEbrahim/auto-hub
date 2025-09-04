@@ -304,3 +304,59 @@ export const deleteRole = async (roleId) => {
 
   return true;
 };
+
+export const createPermission = async (name, description) => {
+  const { data: permission, error } = await supabase
+    .from('permissions')
+    .insert([{ name, description }])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating permission:', error);
+    throw error;
+  }
+
+  return permission;
+};
+
+export const updatePermission = async (permissionId, name, description) => {
+  const { error } = await supabase
+    .from('permissions')
+    .update({ name, description })
+    .eq('id', permissionId);
+
+  if (error) {
+    console.error('Error updating permission:', error);
+    throw error;
+  }
+
+  return true;
+};
+
+export const deletePermission = async (permissionId) => {
+  const { error: deleteRolePermissionsError } = await supabase
+    .from('role_permissions')
+    .delete()
+    .eq('permission_id', permissionId);
+
+  if (deleteRolePermissionsError) {
+    console.error(
+      'Error deleting role permissions:',
+      deleteRolePermissionsError
+    );
+    throw deleteRolePermissionsError;
+  }
+
+  const { error: deletePermissionError } = await supabase
+    .from('permissions')
+    .delete()
+    .eq('id', permissionId);
+
+  if (deletePermissionError) {
+    console.error('Error deleting permission:', deletePermissionError);
+    throw deletePermissionError;
+  }
+
+  return true;
+};

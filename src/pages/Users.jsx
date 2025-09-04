@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Divider, Row, Space, Table, Tag } from 'antd';
 import {
+  deletePermission,
   deleteRole,
   deleteUser,
   getPermissions,
@@ -12,6 +13,7 @@ import moment from 'moment';
 import AddAndUpdateUsersModal from '../components/Users/AddAndUpdateUsersModal.jsx';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import AddAndUpdateRoleModal from '../components/Users/AddAndUpdateRoleModal.jsx';
+import AddAndUpdatePermissionsModal from '../components/Users/AddAndUpdatePermissionsModal.jsx';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -27,6 +29,12 @@ const Users = () => {
     open: false,
     role: null
   });
+
+  const [addAndUpdatePermissionsModal, setAddAndUpdatePermissionsModal] =
+    useState({
+      open: false,
+      permission: null
+    });
 
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();
@@ -112,6 +120,60 @@ const Users = () => {
       title: t('permission_description'),
       dataIndex: 'description',
       key: 'description'
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 250,
+      align: 'center',
+      render: (_, record) => (
+        <Space>
+          <Button
+            loading={loading}
+            disabled={loading}
+            shape={'round'}
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() =>
+              setAddAndUpdatePermissionsModal({
+                open: true,
+                permission: record
+              })
+            }
+          >
+            {t('edit')}
+          </Button>
+
+          <Button
+            shape={'round'}
+            type="default"
+            danger
+            loading={loading}
+            disabled={loading}
+            icon={<DeleteOutlined />}
+            onClick={() =>
+              deletePermission(record.id)
+                .then(() => {
+                  setLoading(true);
+                  getPermissions()
+                    .then((data) =>
+                      getRoles().then((roles) => {
+                        setRoles(roles);
+                        setPermissions(data);
+                      })
+                    )
+                    .catch((error) =>
+                      console.error('Error fetching users:', error)
+                    )
+                    .finally(() => setLoading(false));
+                })
+                .catch((error) => console.error('Error deleting user:', error))
+            }
+          >
+            {t('delete')}
+          </Button>
+        </Space>
+      )
     }
   ];
 
@@ -327,7 +389,10 @@ const Users = () => {
                 block
                 type="primary"
                 onClick={() =>
-                  setAddAndUpdateUserModal({ open: true, user: null })
+                  setAddAndUpdatePermissionsModal({
+                    open: true,
+                    permission: null
+                  })
                 }
               >
                 {t('add_permission')}
@@ -377,6 +442,25 @@ const Users = () => {
           }}
           role={addAndUpdateRoleModal.role}
           permissions={permissions}
+        />
+      ) : null}
+
+      {addAndUpdatePermissionsModal?.open ? (
+        <AddAndUpdatePermissionsModal
+          open={addAndUpdatePermissionsModal.open}
+          onClose={() =>
+            setAddAndUpdatePermissionsModal({ open: false, permission: null })
+          }
+          onDone={() => {
+            setLoading(true);
+            getPermissions()
+              .then((data) => setPermissions(data))
+              .catch((error) =>
+                console.error('Error fetching permissions:', error)
+              )
+              .finally(() => setLoading(false));
+          }}
+          permission={addAndUpdatePermissionsModal.permission}
         />
       ) : null}
     </Card>

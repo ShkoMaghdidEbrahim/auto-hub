@@ -497,5 +497,6 @@
   "error_creating_permission": "Error creating permission",
   "error_updating_permission": "Error updating permission",
   "error_deleting_permission": "Error deleting permission",
-  "update_role": "Update Role"
+  "update_role": "Update Role",
+  "update_permission": "Update Permission"
 }

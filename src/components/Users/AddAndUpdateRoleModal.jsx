@@ -41,6 +41,7 @@ const AddAndUpdateRoleModal = ({
     if (role) {
       updateRole(role.id, values.name, values.description, targetKeys)
         .then(() => {
+          message.success(t('role_updated_successfully'));
           onDone();
           onClose();
         })
@@ -54,6 +55,7 @@ const AddAndUpdateRoleModal = ({
     } else {
       createRole(values.name, values.description, targetKeys)
         .then(() => {
+          message.success(t('role_created_successfully'));
           onDone();
           onClose();
         })

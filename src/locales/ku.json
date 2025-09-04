@@ -497,5 +497,6 @@
   "error_creating_permission": "هەڵە لە دروستکردنی دەسەڵاتدا",
   "error_updating_permission": "هەڵە لە نوێکردنەوەی دەسەڵاتدا",
   "error_deleting_permission": "هەڵە لە سڕینەوەی دەسەڵاتدا",
-  "update_role": "نوێکردنەوەی ڕۆڵ"
+  "update_role": "نوێکردنەوەی ڕۆڵ",
+  "update_permission": "نوێکردنەوەی دەسەڵات"
 }
