@@ -52,7 +52,9 @@ const SiderComponent = ({
           ? isDarkMode
             ? '1px solid #414141'
             : '1px solid #d3d3d3'
-          : 'none'
+          : 'none',
+        paddingLeft: !broken ? 0 : collapsed ? 0 : 10,
+        paddingRight: !broken ? 0 : collapsed ? 0 : 10
       }}
     >
       <div
@@ -65,7 +67,10 @@ const SiderComponent = ({
           fontSize: 20,
           fontWeight: 'bold',
           gap: 5,
-          marginBottom: 5
+          marginBottom: broken ? 10 : 5,
+          marginTop: broken ? 10 : 0,
+          marginLeft: broken ? 4 : 0,
+          marginRight: broken ? 4 : 0
         }}
       >
         {broken ? (
@@ -97,6 +102,8 @@ const SiderComponent = ({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            backgroundColor: broken ? color : 'transparent',
+            borderRadius: broken ? borderRadiusLG + 2 : 0,
             outline: broken
               ? 'none'
               : isDarkMode
