@@ -66,7 +66,7 @@ const SiderComponent = ({
           height: 63,
           fontSize: 20,
           fontWeight: 'bold',
-          gap: 5,
+          gap: 8,
           marginBottom: broken ? 10 : 5,
           marginTop: broken ? 10 : 0,
           marginLeft: broken ? 4 : 0,
