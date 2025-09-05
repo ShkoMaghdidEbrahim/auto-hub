@@ -47,7 +47,7 @@ const SiderComponent = ({
         overflow: 'auto',
         height: '100vh',
         position: broken ? 'fixed' : '',
-        zIndex: 1000,
+        zIndex: 995,
         outline: !broken
           ? isDarkMode
             ? '1px solid #414141'

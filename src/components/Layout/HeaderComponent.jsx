@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 const { Header } = Layout;
 
-
 const HeaderComponent = ({
   setCollapsed,
   isDarkMode,
@@ -83,7 +82,6 @@ const HeaderComponent = ({
               gap: 15
             }}
           >
-
             <div
               onClick={() => setSettingsDrawerOpen(true)}
               style={{
@@ -111,6 +109,7 @@ const HeaderComponent = ({
           isDarkMode={isDarkMode}
           setDarkMode={setDarkMode}
           setColor={setColor}
+          color={color}
           setAuth={setAuth}
           broken={broken}
         />

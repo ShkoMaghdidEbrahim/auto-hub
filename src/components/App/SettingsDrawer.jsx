@@ -1,4 +1,4 @@
-import { Button, Col, Drawer, Row, Radio } from 'antd';
+import { Button, Col, Drawer, Row, Radio, ColorPicker } from 'antd';
 import useLocalStorage from '../../database/useLocalStorage.js';
 import { CloseOutlined, LogoutOutlined } from '@ant-design/icons';
 import { changeLanguage, getCurrentLanguage } from '../../locales/i18n.js';
@@ -14,7 +14,8 @@ const SettingsDrawer = ({
   isDarkMode,
   setDarkMode,
   setColor,
-  broken
+  broken,
+  color
 }) => {
   const { t } = useTranslation();
   useBackGesture(onClose, 'SettingsDrawer');
@@ -128,6 +129,20 @@ const SettingsDrawer = ({
                   </Col>
                 ))}
               </Row>
+            </Col>
+            <Col span={24}>
+              <ColorPicker
+                format={'hex'}
+                defaultFormat={'hex'}
+                disabledAlpha={true}
+                value={color}
+                placement={'bottomRight'}
+                onChange={(color) => setColor(color.toHexString())}
+              >
+                <Button size={'large'} block type="primary">
+                  Custom
+                </Button>
+              </ColorPicker>
             </Col>
           </Row>
           <Button

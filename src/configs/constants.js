@@ -3,8 +3,8 @@ export const colorPrimary = '#006400';
 export const whiteBackground = '#ffffff';
 export const darkBackground = '#141414';
 export const colors = [
-  '#006400',
   '#E4343E',
+  '#006400',
   '#CB8B1E',
   '#52C41A',
   '#B37FEB',

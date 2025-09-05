@@ -251,6 +251,7 @@ const Login = ({ isDarkMode, setDarkMode, color, setColor, broken }) => {
             isDarkMode={isDarkMode}
             setDarkMode={setDarkMode}
             setColor={setColor}
+            color={color}
             broken={broken}
           />
         ) : null}
