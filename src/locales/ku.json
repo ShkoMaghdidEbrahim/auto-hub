@@ -498,5 +498,6 @@
   "error_updating_permission": "هەڵە لە نوێکردنەوەی دەسەڵاتدا",
   "error_deleting_permission": "هەڵە لە سڕینەوەی دەسەڵاتدا",
   "update_role": "نوێکردنەوەی ڕۆڵ",
-  "update_permission": "نوێکردنەوەی دەسەڵات"
+  "update_permission": "نوێکردنەوەی دەسەڵات",
+  "custom_color": "ڕەنگی تایبەتی"
 }

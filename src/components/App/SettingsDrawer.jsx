@@ -137,10 +137,16 @@ const SettingsDrawer = ({
                 disabledAlpha={true}
                 value={color}
                 placement={'bottomRight'}
-                onChange={(color) => setColor(color.toHexString())}
+                onChange={(color) => {
+                  setColor(color.toHexString());
+                  setColorLocalStorage({
+                    color: color.toHexString(),
+                    darkMode: isDarkMode
+                  });
+                }}
               >
                 <Button size={'large'} block type="primary">
-                  Custom
+                  {t('custom_color')}
                 </Button>
               </ColorPicker>
             </Col>

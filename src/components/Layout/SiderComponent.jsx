@@ -63,7 +63,7 @@ const SiderComponent = ({
           alignItems: 'center',
           justifyContent: 'space-between',
           color: 'white',
-          height: 63,
+          height: broken ? 50 : 63,
           fontSize: 20,
           fontWeight: 'bold',
           gap: 8,
@@ -115,7 +115,7 @@ const SiderComponent = ({
             src={'/logo.png'}
             alt="Logo"
             style={{
-              height: 50,
+              height: broken ? 45 : 50,
               objectFit: 'contain'
             }}
           />
