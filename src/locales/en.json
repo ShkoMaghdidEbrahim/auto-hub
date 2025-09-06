@@ -577,5 +577,10 @@
   "inspection_cost_required": "Inspection cost is required",
   "electronic_contract_cost_required": "Electronic contract cost is required",
   "window_check_cost_required": "Window check cost is required",
-  "create_car": "Create Car"
+  "create_car": "Create Car",
+  "predefined_values": "Predefined Values",
+  "car_updated_successfully": "Car updated successfully",
+  "error_updating_car": "Error updating car",
+  "car_added_successfully": "Car added successfully",
+  "error_adding_car": "Error adding car"
 }

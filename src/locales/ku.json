@@ -577,5 +577,10 @@
   "inspection_cost_required": "نرخی تاقیکردنەوە پێویستە",
   "electronic_contract_cost_required": "نرخی پەیمانی ئەلیکترۆنی پێویستە",
   "window_check_cost_required": "نرخی پشکنینی پەنجەرە پێویستە",
-  "create_car": "دروستکردنی ئۆتۆمبێل"
+  "create_car": "دروستکردنی ئۆتۆمبێل",
+  "predefined_values": "نرخە نەگۆڕەکان",
+  "car_updated_successfully": "ئۆتۆمبێل بە سەرکەوتوویی نوێکرایەوە",
+  "error_updating_car": "هەڵە لە نوێکردنەوەی ئۆتۆمبێلدا",
+  "car_added_successfully": "ئۆتۆمبێل بە سەرکەوتوویی زیادکرا",
+  "error_adding_car": "هەڵە لە زیادکردنی ئۆتۆمبێلدا"
 }

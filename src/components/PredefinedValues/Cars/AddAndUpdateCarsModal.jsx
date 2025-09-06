@@ -4,6 +4,7 @@ import {
   Form,
   Input,
   InputNumber,
+  message,
   Modal,
   Row,
   Select,
@@ -40,14 +41,15 @@ const AddAndUpdateCarsModal = ({ open, onClose, car, onDone }) => {
 
   const onFinish = (values) => {
     setLoading(true);
-    console.log(values);
     if (car) {
       updateCar(car.id, values)
         .then(() => {
+          message.success(t('car_updated_successfully'));
           onDone();
           onClose();
         })
         .catch((error) => {
+          message.error(t('error_updating_car'));
           console.error('Error updating car:', error);
         })
         .finally(() => {
@@ -56,10 +58,12 @@ const AddAndUpdateCarsModal = ({ open, onClose, car, onDone }) => {
     } else {
       addCar(values)
         .then(() => {
+          message.success(t('car_added_successfully'));
           onDone();
           onClose();
         })
         .catch((error) => {
+          message.error(t('error_adding_car'));
           console.error('Error adding car:', error);
         })
         .finally(() => {
