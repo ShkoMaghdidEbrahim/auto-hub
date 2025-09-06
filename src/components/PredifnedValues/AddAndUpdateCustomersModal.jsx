@@ -11,7 +11,10 @@ import {
   Typography
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { addCustomer, updateCustomer } from '../../database/CustomersApi.js';
+import {
+  addCustomer,
+  updateCustomer
+} from '../../database/APIs/CustomersApi.js';
 import { useState, useEffect } from 'react';
 
 const { Text } = Typography;

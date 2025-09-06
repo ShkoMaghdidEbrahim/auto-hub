@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { formatIQD } from '../helpers/formatMoney.js';
 import AddAndUpdateCustomersModal from '../components/PredifnedValues/AddAndUpdateCustomersModal.jsx';
 import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpdateCarsModal.jsx';
-import { getCustomers, deleteCustomer } from '../database/CustomersApi';
+import { getCustomers, deleteCustomer } from '../database/APIs/CustomersApi.js';
 import { deleteCar, getCars } from '../database/APIs/CarsApi.js';
 
 const PredefinedValues = () => {
