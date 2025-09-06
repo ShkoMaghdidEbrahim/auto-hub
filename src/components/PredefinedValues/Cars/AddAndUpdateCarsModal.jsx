@@ -11,7 +11,12 @@ import {
   Typography
 } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+  addCar,
+  getSizesEnum,
+  updateCar
+} from '../../../database/APIs/CarsApi.js';
 
 const { Text } = Typography;
 
@@ -19,9 +24,48 @@ const AddAndUpdateCarsModal = ({ open, onClose, car, onDone }) => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
+  const [sizesEnum, setSizesEnum] = useState({
+    data: [],
+    loading: true
+  });
+
+  useEffect(() => {
+    getSizesEnum().then((data) => {
+      setSizesEnum({
+        data: data,
+        loading: false
+      });
+    });
+  }, []);
 
   const onFinish = (values) => {
+    setLoading(true);
     console.log(values);
+    if (car) {
+      updateCar(car.id, values)
+        .then(() => {
+          onDone();
+          onClose();
+        })
+        .catch((error) => {
+          console.error('Error updating car:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      addCar(values)
+        .then(() => {
+          onDone();
+          onClose();
+        })
+        .catch((error) => {
+          console.error('Error adding car:', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   };
 
   return (
@@ -163,14 +207,17 @@ const AddAndUpdateCarsModal = ({ open, onClose, car, onDone }) => {
                 ]}
               >
                 <Select
+                  loading={sizesEnum.loading}
                   style={{
                     width: '100%'
                   }}
                   placeholder={t('vehicle_size')}
                 >
-                  <Select.Option value="small">{t('small')}</Select.Option>
-                  <Select.Option value="medium">{t('medium')}</Select.Option>
-                  <Select.Option value="large">{t('large')}</Select.Option>
+                  {sizesEnum?.data.map((size) => (
+                    <Select.Option key={size.id} value={size.id}>
+                      {size.id} - {size.name}
+                    </Select.Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Space>

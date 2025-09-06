@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
-import { Button, Card, Col, Divider, Row, Table } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Divider, Row, Space, Table } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { formatIQD } from '../helpers/formatMoney.js';
 import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpdateCarsModal.jsx';
+import { deleteCar, getCars } from '../database/APIs/CarsApi.js';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const PredefinedValues = () => {
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(false);
+  const [cars, setCars] = useState([]);
+
   const [addAndUpdateCarsModal, setAddAndUpdateCarsModal] = useState({
     open: false,
     car: null
   });
+
+  useEffect(() => {
+    setLoading(true);
+    getCars()
+      .then((data) => {
+        setCars(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching cars:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const carsColumns = [
     {
@@ -38,44 +56,93 @@ const PredefinedValues = () => {
     },
     {
       title: t('vehicle_size'),
-      dataIndex: 'vehicle_size',
-      key: 'vehicle_size'
+      dataIndex: 'vehicle_size_types',
+      key: 'vehicle_size_types',
+      render: (vehicle_size_types) => vehicle_size_types?.name || '-'
     },
     {
       title: t('size_fee'),
       dataIndex: 'size_fee',
       key: 'size_fee',
-      render: (value) => formatIQD(value.toLocaleString())
+      render: (value) => formatIQD(value)
     },
     {
       title: t('plate_number_cost'),
       dataIndex: 'plate_number_cost',
       key: 'plate_number_cost',
-      render: (value) => formatIQD(value.toLocaleString())
+      render: (value) => formatIQD(value)
     },
     {
       title: t('legal_cost'),
       dataIndex: 'legal_cost',
       key: 'legal_cost',
-      render: (value) => formatIQD(value.toLocaleString())
+      render: (value) => formatIQD(value)
     },
     {
       title: t('inspection_cost'),
       dataIndex: 'inspection_cost',
       key: 'inspection_cost',
-      render: (value) => formatIQD(value.toLocaleString())
+      render: (value) => formatIQD(value)
     },
     {
       title: t('electronic_contract_cost'),
       dataIndex: 'electronic_contract_cost',
       key: 'electronic_contract_cost',
-      render: (value) => formatIQD(value.toLocaleString())
+      render: (value) => formatIQD(value)
     },
     {
       title: t('window_check_cost'),
       dataIndex: 'window_check_cost',
       key: 'window_check_cost',
-      render: (value) => formatIQD(value.toLocaleString())
+      render: (value) => formatIQD(value)
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 250,
+      align: 'center',
+      render: (_, record) => (
+        <Space>
+          <Button
+            loading={loading}
+            disabled={loading}
+            shape={'round'}
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() =>
+              setAddAndUpdateCarsModal({ open: true, car: record })
+            }
+          >
+            {t('edit')}
+          </Button>
+
+          <Button
+            shape={'round'}
+            type="default"
+            danger
+            loading={loading}
+            disabled={loading}
+            icon={<DeleteOutlined />}
+            onClick={() =>
+              deleteCar(record.id)
+                .then(() => {
+                  setLoading(true);
+                  getCars()
+                    .then((data) => {
+                      setCars(data);
+                    })
+                    .catch((error) =>
+                      console.error('Error fetching cars:', error)
+                    )
+                    .finally(() => setLoading(false));
+                })
+                .catch((error) => console.error('Error deleting car:', error))
+            }
+          >
+            {t('delete')}
+          </Button>
+        </Space>
+      )
     }
   ];
 
@@ -121,7 +188,7 @@ const PredefinedValues = () => {
           <Table
             loading={loading}
             columns={carsColumns}
-            dataSource={[]}
+            dataSource={cars}
             scroll={{
               x: 'max-content'
             }}
@@ -134,6 +201,15 @@ const PredefinedValues = () => {
           open={addAndUpdateCarsModal.open}
           car={addAndUpdateCarsModal.car}
           onClose={() => setAddAndUpdateCarsModal({ open: false, car: null })}
+          onDone={() => {
+            setLoading(true);
+            getCars()
+              .then((data) => {
+                setCars(data);
+              })
+              .catch((error) => console.error('Error fetching cars:', error))
+              .finally(() => setLoading(false));
+          }}
         />
       ) : null}
     </Card>
