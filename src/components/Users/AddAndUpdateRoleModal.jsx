@@ -12,7 +12,7 @@ import {
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { createRole, updateRole } from '../../database/UsersApi.js';
+import { createRole, updateRole } from '../../database/APIs/UsersApi.js';
 
 const { Text } = Typography;
 

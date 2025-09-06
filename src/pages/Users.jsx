@@ -7,7 +7,7 @@ import {
   getPermissions,
   getRoles,
   getUsers
-} from '../database/UsersApi.js';
+} from '../database/APIs/UsersApi.js';
 import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import AddAndUpdateUsersModal from '../components/Users/AddAndUpdateUsersModal.jsx';
