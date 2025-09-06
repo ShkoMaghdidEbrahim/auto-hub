@@ -565,5 +565,11 @@
   "electronic_contract_cost": "نرخی پەیمانی ئەلیکترۆنی",
   "window_check_cost": "نرخی پشکنینی پەنجەرە",
   "add_car": "زیادکردنی ئۆتۆمبێل",
-  "cars": "ئۆتۆمبێلەکان"
+  "cars": "ئۆتۆمبێلەکان",
+  "customers": "کڕیارەکان",
+  "add_customer": "کڕیار زیاد بکە",
+  "customer_name": "ناوی کڕیار",
+  "customer_phone": "ژمارەی کڕیار",
+  "customer_email": "ئیمەیڵی کڕیار",
+  "customer_address": "ناونیشانی کڕیار"
 }
