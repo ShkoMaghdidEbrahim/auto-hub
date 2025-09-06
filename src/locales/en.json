@@ -556,5 +556,13 @@
   "please_enter_expenses": "Please enter expenses!",
   "please_enter_fees": "Please enter fees!",
   "please_select_date": "Please select date!",
-  "please_enter_debt_amount": "Please enter debt amount!"
+  "please_enter_debt_amount": "Please enter debt amount!",
+  "id": "ID",
+  "car_model": "Car Model",
+  "plate_number_cost": "Plate Number Cost",
+  "legal_cost": "Legal Cost",
+  "inspection_cost": "Inspection Cost",
+  "electronic_contract_cost": "Electronic Contract Cost",
+  "window_check_cost": "Window Check Cost",
+  "add_car": "Add Car"
 }
