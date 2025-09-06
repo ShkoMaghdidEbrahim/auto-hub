@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Divider, Row, Space, Table, Tag } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  Divider,
+  Row,
+  Space,
+  Table,
+  Tag,
+  Popconfirm
+} from 'antd';
 import {
   deletePermission,
   deleteRole,
@@ -82,14 +92,9 @@ const Users = () => {
             {t('edit')}
           </Button>
 
-          <Button
-            shape={'round'}
-            type="default"
-            danger
-            loading={loading}
-            disabled={loading}
-            icon={<DeleteOutlined />}
-            onClick={() =>
+          <Popconfirm
+            title={t('are_you_sure_you_want_to_delete')}
+            onConfirm={() =>
               deleteUser(record.id)
                 .then(() => {
                   setLoading(true);
@@ -102,9 +107,20 @@ const Users = () => {
                 })
                 .catch((error) => console.error('Error deleting user:', error))
             }
+            okText={t('yes')}
+            cancelText={t('no')}
           >
-            {t('delete')}
-          </Button>
+            <Button
+              shape={'round'}
+              type="default"
+              danger
+              loading={loading}
+              disabled={loading}
+              icon={<DeleteOutlined />}
+            >
+              {t('delete')}
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -144,14 +160,9 @@ const Users = () => {
             {t('edit')}
           </Button>
 
-          <Button
-            shape={'round'}
-            type="default"
-            danger
-            loading={loading}
-            disabled={loading}
-            icon={<DeleteOutlined />}
-            onClick={() =>
+          <Popconfirm
+            title={t('are_you_sure_you_want_to_delete')}
+            onConfirm={() =>
               deletePermission(record.id)
                 .then(() => {
                   setLoading(true);
@@ -169,9 +180,20 @@ const Users = () => {
                 })
                 .catch((error) => console.error('Error deleting user:', error))
             }
+            okText={t('yes')}
+            cancelText={t('no')}
           >
-            {t('delete')}
-          </Button>
+            <Button
+              shape={'round'}
+              type="default"
+              danger
+              loading={loading}
+              disabled={loading}
+              icon={<DeleteOutlined />}
+            >
+              {t('delete')}
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -239,14 +261,9 @@ const Users = () => {
             {t('edit')}
           </Button>
 
-          <Button
-            shape={'round'}
-            type="default"
-            danger
-            loading={loading}
-            disabled={loading}
-            icon={<DeleteOutlined />}
-            onClick={() =>
+          <Popconfirm
+            title={t('are_you_sure_you_want_to_delete')}
+            onConfirm={() =>
               deleteRole(record.id)
                 .then(() => {
                   setLoading(true);
@@ -264,9 +281,20 @@ const Users = () => {
                 })
                 .catch((error) => console.error('Error deleting user:', error))
             }
+            okText={t('yes')}
+            cancelText={t('no')}
           >
-            {t('delete')}
-          </Button>
+            <Button
+              shape={'round'}
+              type="default"
+              danger
+              loading={loading}
+              disabled={loading}
+              icon={<DeleteOutlined />}
+            >
+              {t('delete')}
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
