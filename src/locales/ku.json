@@ -598,5 +598,19 @@
   "customer_phone_required": "ژمارەی تەلەفۆنی کڕیار پێویستە",
   "customer_name_required": "ناوی کڕیار پێویستە",
   "customer_email_required": "ئیمەیڵی کڕیار پێویستە",
-  "customer_address_required": "ناونیشانی کڕیار پێویستە"
+  "customer_address_required": "ناونیشانی کڕیار پێویستە",
+  "vehicle_size_name": "ناوی قەبارەی سەیارە",
+  "vehicle_size_name_required": "ناوی قەبارەی سەیارە پێویستە",
+  "create_vehicle_size": "دروستکردنی قەبارەی سەیارە",
+  "update_vehicle_size": "نوێکردنەوەی قەبارەی سەیارە",
+  "vehicle_size_created_successfully": "قەبارەی سەیارە بە سەرکەوتوویی دروستکرا",
+  "vehicle_size_updated_successfully": "قەبارەی سەیارە بە سەرکەوتوویی نوێکرایەوە",
+  "error_creating_vehicle_size": "هەڵە لە دروستکردنی قەبارەی سەیارەدا",
+  "error_updating_vehicle_size": "هەڵە لە نوێکردنەوەی قەبارەی سەیارەدا",
+  "existing_vehicle_sizes": "قەبارەکانی سەیارەی هەیە",
+  "add_new_vehicle_size": "قەبارەی سەیارەی نوێ زیاد بکە",
+  "vehicle_size_deleted_successfully": "قەبارەی سەیارە بە سەرکەوتوویی سڕایەوە",
+  "error_deleting_vehicle_size": "هەڵە لە سڕینەوەی قەبارەی سەیارەدا",
+  "are_you_sure_delete": "دڵنیایت کە دەتەوێت ئەم قەبارەی سەیارەیە بسڕیتەوە؟",
+  "edit_car_size": "قەبارەی سەیارە"
 }

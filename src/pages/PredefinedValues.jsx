@@ -14,8 +14,10 @@ import { useTranslation } from 'react-i18next';
 import { formatIQD } from '../helpers/formatMoney.js';
 import AddAndUpdateCustomersModal from '../components/PredefinedValues/Customers/AddAndUpdateCustomersModal.jsx';
 import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpdateCarsModal.jsx';
+import AddAndEditCarSizeModal from '../components/PredefinedValues/Cars/AddAndEditCarSizeModal.jsx';
 import { getCustomers, deleteCustomer } from '../database/APIs/CustomersApi.js';
 import { deleteCar, getCars } from '../database/APIs/CarsApi.js';
+import { getSizes, deleteSize } from '../database/APIs/CarSizeApi.js';
 
 const PredefinedValues = () => {
   const { t } = useTranslation();
@@ -23,9 +25,14 @@ const PredefinedValues = () => {
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [cars, setCars] = useState([]);
+  const [carSizes, setCarSizes] = useState([]);
   const [addAndUpdateCarsModal, setAddAndUpdateCarsModal] = useState({
     open: false,
     car: null
+  });
+  const [addAndEditCarSizeModal, setAddAndEditCarSizeModal] = useState({
+    open: false,
+    size: null
   });
 
   const [addAndUpdateCustomersModal, setAddAndUpdateCustomersModal] = useState({
@@ -35,10 +42,11 @@ const PredefinedValues = () => {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([getCars(), getCustomers()])
-      .then(([carsData, customersData]) => {
+    Promise.all([getCars(), getCustomers(), getSizes()])
+      .then(([carsData, customersData, sizesData]) => {
         setCars(carsData);
         setCustomers(customersData);
+        setCarSizes(sizesData);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -263,7 +271,7 @@ const PredefinedValues = () => {
         <Row gutter={[10, 16]}>
           <Col span={24}>
             <Row gutter={[10, 10]}>
-              <Col span={18}>
+              <Col span={12}>
                 <Divider
                   orientation={t('rtl') ? 'right' : 'left'}
                   style={{
@@ -274,6 +282,17 @@ const PredefinedValues = () => {
                 >
                   {t('cars')}
                 </Divider>
+              </Col>
+              <Col span={6}>
+                <Button
+                  block
+                  type="primary"
+                  onClick={() =>
+                    setAddAndEditCarSizeModal({ open: true, size: null })
+                  }
+                >
+                  {t('edit_car_size')}
+                </Button>
               </Col>
               <Col span={6}>
                 <Button
@@ -382,6 +401,26 @@ const PredefinedValues = () => {
                 setCars(data);
               })
               .catch((error) => console.error('Error fetching cars:', error))
+              .finally(() => setLoading(false));
+          }}
+        />
+      ) : null}
+
+      {addAndEditCarSizeModal.open ? (
+        <AddAndEditCarSizeModal
+          open={addAndEditCarSizeModal.open}
+          size={addAndEditCarSizeModal.size}
+          carSizes={carSizes}
+          onClose={() => setAddAndEditCarSizeModal({ open: false, size: null })}
+          onDone={() => {
+            setLoading(true);
+            getSizes()
+              .then((data) => {
+                setCarSizes(data);
+              })
+              .catch((error) =>
+                console.error('Error fetching car sizes:', error)
+              )
               .finally(() => setLoading(false));
           }}
         />
