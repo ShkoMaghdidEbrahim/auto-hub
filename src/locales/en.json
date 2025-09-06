@@ -564,5 +564,6 @@
   "inspection_cost": "Inspection Cost",
   "electronic_contract_cost": "Electronic Contract Cost",
   "window_check_cost": "Window Check Cost",
-  "add_car": "Add Car"
+  "add_car": "Add Car",
+  "cars": "Cars"
 }
