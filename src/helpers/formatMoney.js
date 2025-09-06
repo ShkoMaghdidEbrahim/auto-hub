@@ -1,4 +1,5 @@
 export const formatIQD = (value) => {
+  console.log(value);
   if (value === null || value === undefined || isNaN(value)) return '';
   return `${Number(value).toLocaleString()} IQD`;
 };

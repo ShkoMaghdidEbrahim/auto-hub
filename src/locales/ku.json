@@ -571,5 +571,22 @@
   "customer_name": "ناوی کڕیار",
   "customer_phone": "ژمارەی کڕیار",
   "customer_email": "ئیمەیڵی کڕیار",
-  "customer_address": "ناونیشانی کڕیار"
+  "customer_address": "ناونیشانی کڕیار",
+  "update_car": "نوێکردنەوەی ئۆتۆمبێل",
+  "car_name_required": "ناوی ئۆتۆمبێل پێویستە",
+  "car_model_required": "مۆدێلی ئۆتۆمبێل پێویستە",
+  "number_of_cylinders_required": "ژمارەی سیلندەر پێویستە",
+  "vehicle_size_required": "قەبارەی سەیارە پێویستە",
+  "size_fee_required": "ڕەسم قەبارە پێویستە",
+  "plate_number_cost_required": "نرخی ژمارەی تابلۆ پێویستە",
+  "legal_cost_required": "نرخی یاسایی پێویستە",
+  "inspection_cost_required": "نرخی تاقیکردنەوە پێویستە",
+  "electronic_contract_cost_required": "نرخی پەیمانی ئەلیکترۆنی پێویستە",
+  "window_check_cost_required": "نرخی پشکنینی پەنجەرە پێویستە",
+  "create_car": "دروستکردنی ئۆتۆمبێل",
+  "predefined_values": "نرخە نەگۆڕەکان",
+  "car_updated_successfully": "ئۆتۆمبێل بە سەرکەوتوویی نوێکرایەوە",
+  "error_updating_car": "هەڵە لە نوێکردنەوەی ئۆتۆمبێلدا",
+  "car_added_successfully": "ئۆتۆمبێل بە سەرکەوتوویی زیادکرا",
+  "error_adding_car": "هەڵە لە زیادکردنی ئۆتۆمبێلدا"
 }

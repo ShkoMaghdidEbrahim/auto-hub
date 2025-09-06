@@ -571,5 +571,22 @@
   "customer_name": "Customer Name",
   "customer_phone": "Customer Phone",
   "customer_email": "Customer Email",
-  "customer_address": "Customer Address"
+  "customer_address": "Customer Address",
+  "update_car": "Update Car",
+  "car_name_required": "Car name is required",
+  "car_model_required": "Car model is required",
+  "number_of_cylinders_required": "Number of cylinders is required",
+  "vehicle_size_required": "Vehicle size is required",
+  "size_fee_required": "Size fee is required",
+  "plate_number_cost_required": "Plate number cost is required",
+  "legal_cost_required": "Legal cost is required",
+  "inspection_cost_required": "Inspection cost is required",
+  "electronic_contract_cost_required": "Electronic contract cost is required",
+  "window_check_cost_required": "Window check cost is required",
+  "create_car": "Create Car",
+  "predefined_values": "Predefined Values",
+  "car_updated_successfully": "Car updated successfully",
+  "error_updating_car": "Error updating car",
+  "car_added_successfully": "Car added successfully",
+  "error_adding_car": "Error adding car"
 }

@@ -13,9 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
   createPermission,
-  updatePermission,
-  updateRole
-} from '../../database/UsersApi.js';
+  updatePermission
+} from '../../database/APIs/UsersApi.js';
 
 const { Text } = Typography;
 
