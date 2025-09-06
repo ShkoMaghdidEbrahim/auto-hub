@@ -273,17 +273,13 @@ const Users = () => {
   ];
 
   useEffect(() => {
-    getUsers()
-      .then((data) => {
-        getRoles().then((roles) => {
-          getPermissions().then((permissions) => {
-            setUsers(data);
-            setRoles(roles);
-            setPermissions(permissions);
-          });
-        });
+    Promise.all([getUsers(), getRoles(), getPermissions()])
+      .then(([users, roles, permissions]) => {
+        setUsers(users);
+        setRoles(roles);
+        setPermissions(permissions);
       })
-      .catch((error) => console.error('Error fetching users:', error))
+      .catch((error) => console.error('Error fetching data:', error))
       .finally(() => setLoading(false));
   }, []);
 
