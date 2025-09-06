@@ -565,5 +565,17 @@
   "electronic_contract_cost": "Electronic Contract Cost",
   "window_check_cost": "Window Check Cost",
   "add_car": "Add Car",
-  "cars": "Cars"
+  "cars": "Cars",
+  "update_car": "update_car",
+  "car_name_required": "car_name_required",
+  "car_model_required": "car_model_required",
+  "number_of_cylinders_required": "number_of_cylinders_required",
+  "vehicle_size_required": "vehicle_size_required",
+  "size_fee_required": "size_fee_required",
+  "plate_number_cost_required": "plate_number_cost_required",
+  "legal_cost_required": "legal_cost_required",
+  "inspection_cost_required": "inspection_cost_required",
+  "electronic_contract_cost_required": "electronic_contract_cost_required",
+  "window_check_cost_required": "window_check_cost_required",
+  "create_car": "create_car"
 }

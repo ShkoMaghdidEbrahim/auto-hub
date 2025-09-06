@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Card, Col, Divider, Row, Table } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { formatIQD } from '../helpers/formatMoney.js';
+import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpdateCarsModal.jsx';
 
 const PredefinedValues = () => {
   const { t } = useTranslation();
@@ -127,6 +128,14 @@ const PredefinedValues = () => {
           />
         </Col>
       </Row>
+
+      {addAndUpdateCarsModal.open ? (
+        <AddAndUpdateCarsModal
+          open={addAndUpdateCarsModal.open}
+          car={addAndUpdateCarsModal.car}
+          onClose={() => setAddAndUpdateCarsModal({ open: false, car: null })}
+        />
+      ) : null}
     </Card>
   );
 };

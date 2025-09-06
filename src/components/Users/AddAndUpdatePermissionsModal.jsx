@@ -11,11 +11,7 @@ import {
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import {
-  createPermission,
-  updatePermission,
-  updateRole
-} from '../../database/UsersApi.js';
+import { createPermission, updatePermission } from '../../database/UsersApi.js';
 
 const { Text } = Typography;
 
