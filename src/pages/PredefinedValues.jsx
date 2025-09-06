@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Col, Divider, Row, Table, Space, Modal } from 'antd';
 import {
-  EditOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined
-} from '@ant-design/icons';
+  Button,
+  Card,
+  Col,
+  Divider,
+  Row,
+  Table,
+  Space,
+  Popconfirm
+} from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { formatIQD } from '../helpers/formatMoney.js';
-import AddAndUpdateCustomersModal from '../components/PredifnedValues/AddAndUpdateCustomersModal.jsx';
+import AddAndUpdateCustomersModal from '../components/PredefinedValues/Customers/AddAndUpdateCustomersModal.jsx';
 import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpdateCarsModal.jsx';
 import { getCustomers, deleteCustomer } from '../database/APIs/CustomersApi.js';
 import { deleteCar, getCars } from '../database/APIs/CarsApi.js';
@@ -22,66 +27,21 @@ const PredefinedValues = () => {
     open: false,
     car: null
   });
+
   const [addAndUpdateCustomersModal, setAddAndUpdateCustomersModal] = useState({
     open: false,
     customer: null
   });
-  const [deleteConfirmModal, setDeleteConfirmModal] = useState({
-    open: false,
-    customerId: null,
-    customerName: ''
-  });
-
-  // Fetch customers from database
-  const fetchCustomers = async () => {
-    try {
-      setLoading(true);
-      const data = await getCustomers();
-      setCustomers(data);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Load customers when component mounts
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
-  // Handle delete confirmation
-  const handleDeleteCustomer = (customerId, customerName) => {
-    setDeleteConfirmModal({
-      open: true,
-      customerId,
-      customerName
-    });
-  };
-
-  // Confirm delete action
-  const confirmDelete = async () => {
-    try {
-      await deleteCustomer(deleteConfirmModal.customerId);
-      fetchCustomers();
-      setDeleteConfirmModal({
-        open: false,
-        customerId: null,
-        customerName: ''
-      });
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-    }
-  };
 
   useEffect(() => {
     setLoading(true);
-    getCars()
-      .then((data) => {
-        setCars(data);
+    Promise.all([getCars(), getCustomers()])
+      .then(([carsData, customersData]) => {
+        setCars(carsData);
+        setCustomers(customersData);
       })
       .catch((error) => {
-        console.error('Error fetching cars:', error);
+        console.error('Error fetching data:', error);
       })
       .finally(() => {
         setLoading(false);
@@ -173,14 +133,9 @@ const PredefinedValues = () => {
             {t('edit')}
           </Button>
 
-          <Button
-            shape={'round'}
-            type="default"
-            danger
-            loading={loading}
-            disabled={loading}
-            icon={<DeleteOutlined />}
-            onClick={() =>
+          <Popconfirm
+            title={t('are_you_sure_you_want_to_delete')}
+            onConfirm={() =>
               deleteCar(record.id)
                 .then(() => {
                   setLoading(true);
@@ -195,9 +150,20 @@ const PredefinedValues = () => {
                 })
                 .catch((error) => console.error('Error deleting car:', error))
             }
+            okText={t('yes')}
+            cancelText={t('no')}
           >
-            {t('delete')}
-          </Button>
+            <Button
+              shape={'round'}
+              type="default"
+              danger
+              loading={loading}
+              disabled={loading}
+              icon={<DeleteOutlined />}
+            >
+              {t('delete')}
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -249,17 +215,37 @@ const PredefinedValues = () => {
             {t('edit')}
           </Button>
 
-          <Button
-            shape={'round'}
-            type="default"
-            danger
-            loading={loading}
-            disabled={loading}
-            icon={<DeleteOutlined />}
-            onClick={() => handleDeleteCustomer(record.id, record.full_name)}
+          <Popconfirm
+            title={t('are_you_sure_you_want_to_delete')}
+            onConfirm={() => {
+              setLoading(true);
+              deleteCustomer(record.id).then(() =>
+                getCustomers()
+                  .then((data) => {
+                    setCustomers(data);
+                  })
+                  .catch((error) => {
+                    console.error('Error fetching customers:', error);
+                  })
+                  .finally(() => {
+                    setLoading(false);
+                  })
+              );
+            }}
+            okText={t('yes')}
+            cancelText={t('no')}
           >
-            {t('delete')}
-          </Button>
+            <Button
+              shape={'round'}
+              type="default"
+              danger
+              loading={loading}
+              disabled={loading}
+              icon={<DeleteOutlined />}
+            >
+              {t('delete')}
+            </Button>
+          </Popconfirm>
         </Space>
       )
     }
@@ -313,18 +299,14 @@ const PredefinedValues = () => {
               }}
             />
           </Col>
-        </Row>
-      </Card>
-      <Card
-        style={{
-          borderRadius: 0
-        }}
-        variant={'borderless'}
-        key={'customers'}
-      >
-        <Row gutter={[10, 16]}>
+
           <Col span={24}>
-            <Row gutter={[10, 10]}>
+            <Row
+              gutter={[10, 10]}
+              style={{
+                marginTop: 16
+              }}
+            >
               <Col span={18}>
                 <Divider
                   orientation={t('rtl') ? 'right' : 'left'}
@@ -367,14 +349,26 @@ const PredefinedValues = () => {
           </Col>
         </Row>
       </Card>
-      <AddAndUpdateCustomersModal
-        open={addAndUpdateCustomersModal.open}
-        onClose={() =>
-          setAddAndUpdateCustomersModal({ open: false, customer: null })
-        }
-        customer={addAndUpdateCustomersModal.customer}
-        onDone={fetchCustomers}
-      />
+      {addAndUpdateCustomersModal.open ? (
+        <AddAndUpdateCustomersModal
+          open={addAndUpdateCustomersModal.open}
+          onClose={() =>
+            setAddAndUpdateCustomersModal({ open: false, customer: null })
+          }
+          customer={addAndUpdateCustomersModal.customer}
+          onDone={() => {
+            setLoading(true);
+            getCustomers()
+              .then((data) => {
+                setCustomers(data);
+              })
+              .catch((error) =>
+                console.error('Error fetching customers:', error)
+              )
+              .finally(() => setLoading(false));
+          }}
+        />
+      ) : null}
 
       {addAndUpdateCarsModal.open ? (
         <AddAndUpdateCarsModal
@@ -392,53 +386,6 @@ const PredefinedValues = () => {
           }}
         />
       ) : null}
-
-      {/* Custom Delete Confirmation Modal */}
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
-            {t('confirm_delete')}
-          </div>
-        }
-        open={deleteConfirmModal.open}
-        onCancel={() =>
-          setDeleteConfirmModal({
-            open: false,
-            customerId: null,
-            customerName: ''
-          })
-        }
-        footer={[
-          <Button
-            key="cancel"
-            onClick={() =>
-              setDeleteConfirmModal({
-                open: false,
-                customerId: null,
-                customerName: ''
-              })
-            }
-          >
-            {t('no')}
-          </Button>,
-          <Button
-            key="delete"
-            type="primary"
-            danger
-            onClick={confirmDelete}
-            loading={loading}
-          >
-            {t('yes')}
-          </Button>
-        ]}
-        centered
-      >
-        <p>
-          {t('are_you_sure_you_want_to_delete')}{' '}
-          <strong>"{deleteConfirmModal.customerName}"</strong>?
-        </p>
-      </Modal>
     </>
   );
 };

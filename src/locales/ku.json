@@ -588,5 +588,15 @@
   "car_updated_successfully": "ئۆتۆمبێل بە سەرکەوتوویی نوێکرایەوە",
   "error_updating_car": "هەڵە لە نوێکردنەوەی ئۆتۆمبێلدا",
   "car_added_successfully": "ئۆتۆمبێل بە سەرکەوتوویی زیادکرا",
-  "error_adding_car": "هەڵە لە زیادکردنی ئۆتۆمبێلدا"
+  "error_adding_car": "هەڵە لە زیادکردنی ئۆتۆمبێلدا",
+  "customer_updated_successfully": "کڕیار بە سەرکەوتوویی نوێکرایەوە",
+  "error_updating_customer": "هەڵە لە نوێکردنەوەی کڕیاردا",
+  "customer_created_successfully": "کڕیار بە سەرکەوتوویی دروستکرا",
+  "error_creating_customer": "هەڵە لە دروستکردنی کڕیاردا",
+  "update_customer": "نوێکردنەوەی کڕیار",
+  "create_customer": "دروستکردنی کڕیار",
+  "customer_phone_required": "ژمارەی تەلەفۆنی کڕیار پێویستە",
+  "customer_name_required": "ناوی کڕیار پێویستە",
+  "customer_email_required": "ئیمەیڵی کڕیار پێویستە",
+  "customer_address_required": "ناونیشانی کڕیار پێویستە"
 }

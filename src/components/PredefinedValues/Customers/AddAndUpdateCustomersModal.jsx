@@ -6,7 +6,6 @@ import {
   message,
   Modal,
   Row,
-  Select,
   Space,
   Typography
 } from 'antd';
@@ -14,39 +13,20 @@ import { useTranslation } from 'react-i18next';
 import {
   addCustomer,
   updateCustomer
-} from '../../database/APIs/CustomersApi.js';
-import { useState, useEffect } from 'react';
+} from '../../../database/APIs/CustomersApi.js';
+import { useState } from 'react';
 
 const { Text } = Typography;
 
 const AddAndUpdateCustomersModal = ({ open, onClose, customer, onDone }) => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
-
-  // Reset form when customer prop changes
-  useEffect(() => {
-    if (open) {
-      form.setFieldsValue({
-        full_name: customer?.full_name || '',
-        phone: customer?.phone || '',
-        email: customer?.email || '',
-        address: customer?.address || ''
-      });
-    }
-  }, [open, customer, form]);
 
   const onFinish = (values) => {
     setLoading(true);
-    const customerData = {
-      full_name: values.full_name,
-      phone: values.phone,
-      email: values.email,
-      address: values.address
-    };
 
     if (customer) {
-      updateCustomer(customer.id, customerData)
+      updateCustomer(customer.id, values)
         .then(() => {
           message.success(t('customer_updated_successfully'));
           onClose();
@@ -60,7 +40,7 @@ const AddAndUpdateCustomersModal = ({ open, onClose, customer, onDone }) => {
           setLoading(false);
         });
     } else {
-      addCustomer(customerData)
+      addCustomer(values)
         .then(() => {
           message.success(t('customer_created_successfully'));
           onClose();
@@ -84,7 +64,13 @@ const AddAndUpdateCustomersModal = ({ open, onClose, customer, onDone }) => {
       footer={null}
       destroyOnHidden={true}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
+      <Form
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          ...customer
+        }}
+      >
         <Row gutter={[10, 10]}>
           <Col span={24}>
             <Space

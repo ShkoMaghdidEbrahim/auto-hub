@@ -588,5 +588,15 @@
   "car_updated_successfully": "Car updated successfully",
   "error_updating_car": "Error updating car",
   "car_added_successfully": "Car added successfully",
-  "error_adding_car": "Error adding car"
+  "error_adding_car": "Error adding car",
+  "customer_updated_successfully": "Customer updated successfully",
+  "error_updating_customer": "Error updating customer",
+  "customer_created_successfully": "Customer created successfully",
+  "error_creating_customer": "Error creating customer",
+  "update_customer": "Update Customer",
+  "create_customer": "Create Customer",
+  "customer_phone_required": "Customer phone is required",
+  "customer_name_required": "Customer name is required",
+  "customer_email_required": "Customer email is required",
+  "customer_address_required": "Customer address is required"
 }

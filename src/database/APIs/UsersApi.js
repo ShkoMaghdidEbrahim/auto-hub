@@ -122,7 +122,6 @@ export const getRoles = async () => {
     throw permissionsError;
   }
 
-  // Group permissions by role
   const permissionsByRole = {};
   rolePermissions.forEach(({ role_id, permission_id }) => {
     if (!permissionsByRole[role_id]) {
@@ -131,7 +130,6 @@ export const getRoles = async () => {
     permissionsByRole[role_id].push(permission_id);
   });
 
-  // Attach permissions to each role
   return roles.map((role) => ({
     ...role,
     permissions: permissionsByRole[role.id] || []

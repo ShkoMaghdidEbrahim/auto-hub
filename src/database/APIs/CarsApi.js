@@ -6,7 +6,6 @@ export const getCars = async () => {
     .select('*, vehicle_size_types(name)')
     .eq('is_deleted', false);
 
-  console.log(data);
   if (error) {
     console.error('Error fetching cars:', error);
     throw error;
