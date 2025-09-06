@@ -4,6 +4,7 @@ import routes from '../../routes.jsx';
 import { useState } from 'react';
 import SettingsDrawer from '../App/SettingsDrawer.jsx';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 const { Header } = Layout;
 
@@ -20,6 +21,8 @@ const HeaderComponent = ({
 }) => {
   const { t } = useTranslation();
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
+
+  const location = useLocation();
 
   return (
     <>
@@ -66,12 +69,10 @@ const HeaderComponent = ({
               margin: 0
             }}
           >
-            {CustomHeader
-              ? CustomHeader
-              : t(
-                  routes.find((route) => '#' + route.path === location.hash)
-                    ?.label
-                )}
+            {t(
+              CustomHeader ||
+                routes.find((route) => route.path === location.pathname)?.label
+            )}
           </Typography.Title>
 
           <div
