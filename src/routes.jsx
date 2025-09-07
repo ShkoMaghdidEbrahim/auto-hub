@@ -52,7 +52,7 @@ const routes = [
     component: Users,
     icon: <FaUsersGear style={{ fontSize: 20 }} />,
     label: 'users',
-    permission: 'ManageUsers',
+    permission: 'Dashboard', // Temporarily use existing permission
     show: true
   }
 ];

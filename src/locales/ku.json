@@ -516,6 +516,7 @@
   "contract_price": "نرخی گرێبەست",
   "window_price": "نرخی پەنجەرە",
   "fees": "ڕەسمەکان",
+  "labor_fees": "ڕەسمەکانی کار",
   "total_auto_calculated": "کۆی گشتی (خۆکار)",
   "note": "تێبینی",
   "has_outstanding_debt": "قەرز",
@@ -537,6 +538,7 @@
   "enter_window_price": "نرخی پەنجەرە بنووسە",
   "enter_expenses": "خەرجی بنووسە",
   "enter_fees": "ڕەسمەکان بنووسە",
+  "enter_labor_fees": "ڕەسمەکانی کار بنووسە",
   "total_calculated_automatically": "کۆی گشتی بە شێوەی خۆکار دەحسابێتەوە",
   "enter_debt_amount": "بڕی قەرز بنووسە",
   "enter_additional_notes": "هەر تێبینییەکی زیاتر بنووسە...",
@@ -555,6 +557,7 @@
   "please_enter_window_price": "تکایە نرخی پەنجەرە بنووسە!",
   "please_enter_expenses": "تکایە خەرجی بنووسە!",
   "please_enter_fees": "تکایە ڕەسمەکان بنووسە!",
+  "please_enter_labor_fees": "تکایە ڕەسمەکانی کار بنووسە!",
   "please_select_date": "تکایە بەروار هەڵبژێرە!",
   "please_enter_debt_amount": "تکایە بڕی قەرز بنووسە!",
   "id": "ناسنامه",
@@ -612,5 +615,7 @@
   "vehicle_size_deleted_successfully": "قەبارەی سەیارە بە سەرکەوتوویی سڕایەوە",
   "error_deleting_vehicle_size": "هەڵە لە سڕینەوەی قەبارەی سەیارەدا",
   "are_you_sure_delete": "دڵنیایت کە دەتەوێت ئەم قەبارەی سەیارەیە بسڕیتەوە؟",
-  "edit_car_size": "قەبارەی سەیارە"
+  "edit_car_size": "قەبارەی سەیارە",
+  "add_registration": "تۆماری نوێ",
+  "edit_registration": "دەستکاریکردنی تۆمار"
 }

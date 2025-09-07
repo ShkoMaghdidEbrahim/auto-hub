@@ -45,8 +45,8 @@
   "projects": "Projects",
   "project": "Project",
   "project_name": "Project Name",
-  "naqll_gumrg": "Transfer and Migration",
-  "tarqim_mrur": "Transfer Review",
+  "naqll_gumrg": "Transportation and Importation",
+  "tarqim_mrur": "Vehicle Registration",
   "project_description": "Project Description",
   "create_project": "Create Project",
   "update": "Update",
@@ -516,6 +516,7 @@
   "contract_price": "Contract Price",
   "window_price": "Window Price",
   "fees": "Fees",
+  "labor_fees": "Labor Fees",
   "total_auto_calculated": "Total (Auto-calculated)",
   "note": "Note",
   "has_outstanding_debt": "Debt",
@@ -537,6 +538,7 @@
   "enter_window_price": "Enter window price",
   "enter_expenses": "Enter expenses",
   "enter_fees": "Enter fees",
+  "enter_labor_fees": "Enter labor fees",
   "total_calculated_automatically": "Total will be calculated automatically",
   "enter_debt_amount": "Enter debt amount",
   "enter_additional_notes": "Enter any additional notes...",
@@ -555,6 +557,7 @@
   "please_enter_window_price": "Please enter window price!",
   "please_enter_expenses": "Please enter expenses!",
   "please_enter_fees": "Please enter fees!",
+  "please_enter_labor_fees": "Please enter labor fees!",
   "please_select_date": "Please select date!",
   "please_enter_debt_amount": "Please enter debt amount!",
   "id": "ID",
@@ -612,5 +615,7 @@
   "vehicle_size_deleted_successfully": "Vehicle size deleted successfully",
   "error_deleting_vehicle_size": "Error deleting vehicle size",
   "are_you_sure_delete": "Are you sure you want to delete this vehicle size?",
-  "edit_car_size": "Edit Car Size"
+  "edit_car_size": "Edit Car Size",
+  "add_registration": "Add Registration",
+  "edit_registration": "Edit Registration"
 }

@@ -1,14 +1,170 @@
-import React, { useState } from 'react';
-import { Card, Button, Typography } from 'antd';
-import { CarOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import {
+  Card,
+  Button,
+  Typography,
+  Divider,
+  Row,
+  Col,
+  Table,
+  Tag,
+  Popconfirm,
+  Space
+} from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import VehicleRegistrationDrawer from '../components/TarqimMrur/VehicleRegistrationDrawer';
+import AddAndUpdateVehicleRegistrationDrawer from '../components/TarqimMrur/AddAndUpdateVehicleRegistrationDrawer';
+import {
+  getRegistrations,
+  deleteRegistration
+} from '../database/APIs/RegistrationApi';
+import { formatIQD } from '../helpers/formatMoney';
 
 const { Title } = Typography;
 
 const TarqimMrur = () => {
   const { t } = useTranslation();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [registrationInfo, setRegistrationInfo] = useState([]);
+
+  // Fetch registrations function
+  const fetchRegistrations = async () => {
+    try {
+      setLoading(true);
+      const data = await getRegistrations();
+      setRegistrationInfo(data);
+    } catch (error) {
+      console.error('Error fetching registrations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch registrations on component mount
+  useEffect(() => {
+    fetchRegistrations();
+  }, []);
+
+  const [
+    addAndUpdateVehicleRegistrationModal,
+    setAddAndUpdateVehicleRegistrationModal
+  ] = useState({
+    open: false,
+    registration: null
+  });
+
+  // Define columns for the registrations table
+  const registrationColumns = [
+    {
+      title: t('vin_number'),
+      dataIndex: 'vin_number',
+      key: 'vin_number',
+      width: 150
+    },
+    {
+      title: t('customer_name'),
+      dataIndex: 'customers',
+      key: 'full_name',
+      width: 120,
+      render: (customer) => customer?.full_name || t('no_customer')
+    },
+    {
+      title: t('car_name'),
+      dataIndex: 'car_name',
+      key: 'car_name',
+      width: 120
+    },
+    {
+      title: t('car_model'),
+      dataIndex: 'car_model',
+      key: 'car_model',
+      width: 100
+    },
+    {
+      title: t('vehicle_size'),
+      dataIndex: 'vehicle_size_types',
+      key: 'vehicle_size',
+      width: 120,
+      render: (vehicleSize) => vehicleSize?.name || t('no_size')
+    },
+    {
+      title: t('car_color'),
+      dataIndex: 'car_color',
+      key: 'car_color',
+      width: 100
+    },
+    {
+      title: t('plate_number'),
+      dataIndex: 'temporary_plate_number',
+      key: 'temporary_plate_number',
+      width: 120
+    },
+    {
+      title: t('total'),
+      dataIndex: 'total',
+      key: 'total',
+      width: 100,
+      render: (value) => formatIQD(value)
+    },
+    {
+      title: t('created_at'),
+      dataIndex: 'created_at',
+      key: 'created_at',
+      width: 120,
+      render: (value) => new Date(value).toLocaleDateString()
+    },
+    {
+      title: t('actions'),
+      key: 'actions',
+      width: 250,
+      align: 'center',
+      render: (_, record) => (
+        <Space>
+          <Button
+            loading={loading}
+            disabled={loading}
+            shape={'round'}
+            type="default"
+            icon={<EditOutlined />}
+            onClick={() =>
+              setAddAndUpdateVehicleRegistrationModal({
+                open: true,
+                registration: record
+              })
+            }
+          >
+            {t('edit')}
+          </Button>
+
+          <Popconfirm
+            title={t('are_you_sure_you_want_to_delete')}
+            onConfirm={() =>
+              deleteRegistration(record.id)
+                .then(() => {
+                  fetchRegistrations();
+                })
+                .catch((error) => {
+                  console.error('Error deleting registration:', error);
+                })
+            }
+            okText={t('yes')}
+            cancelText={t('no')}
+          >
+            <Button
+              shape={'round'}
+              type="default"
+              danger
+              loading={loading}
+              disabled={loading}
+              icon={<DeleteOutlined />}
+            >
+              {t('delete')}
+            </Button>
+          </Popconfirm>
+        </Space>
+      )
+    }
+  ];
 
   const showDrawer = () => {
     setDrawerOpen(true);
@@ -22,41 +178,69 @@ const TarqimMrur = () => {
     <>
       <Card
         style={{
-          minHeight: '100%',
-          borderRadius: 0
+          borderRadius: 0,
+          marginBottom: '16px'
         }}
         variant={'borderless'}
         key={'dashboard'}
       >
-        <Title level={2} style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <CarOutlined style={{ marginRight: '8px' }} />
-          {t('tarqim_mrur')}
-        </Title>
+        <Row gutter={[10, 16]}>
+          <Col span={24}>
+            <Row gutter={[10, 10]}>
+              <Col span={18}>
+                <Divider
+                  orientation={t('rtl') ? 'right' : 'left'}
+                  style={{
+                    fontSize: 24,
+                    margin: 0
+                  }}
+                  dashed={true}
+                >
+                  {t('cars')}
+                </Divider>
+              </Col>
+              <Col span={6}>
+                <Button
+                  block
+                  type="primary"
+                  onClick={() =>
+                    setAddAndUpdateVehicleRegistrationModal({
+                      open: true,
+                      registration: null
+                    })
+                  }
+                >
+                  {t('add_registration')}
+                </Button>
+              </Col>
+            </Row>
+          </Col>
 
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <p style={{ fontSize: '16px', color: '#666', marginBottom: '24px' }}>
-            {t('entry_form_description')}
-          </p>
-
-          <Button
-            type="primary"
-            size="large"
-            icon={<CarOutlined />}
-            onClick={showDrawer}
-            style={{
-              minWidth: '200px',
-              height: '50px',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
-          >
-            {t('entry_form')}
-          </Button>
-        </div>
+          <Col span={24}>
+            <Table
+              loading={loading}
+              columns={registrationColumns}
+              dataSource={registrationInfo}
+              scroll={{
+                x: 'max-content'
+              }}
+            />
+          </Col>
+        </Row>
       </Card>
 
-      {drawerOpen ? (
-        <VehicleRegistrationDrawer open={drawerOpen} onClose={onDrawerClose} />
+      {addAndUpdateVehicleRegistrationModal.open ? (
+        <AddAndUpdateVehicleRegistrationDrawer
+          open={addAndUpdateVehicleRegistrationModal.open}
+          registration={addAndUpdateVehicleRegistrationModal.registration}
+          onClose={() =>
+            setAddAndUpdateVehicleRegistrationModal({
+              open: false,
+              registration: null
+            })
+          }
+          onSuccess={fetchRegistrations}
+        />
       ) : null}
     </>
   );
