@@ -17,7 +17,6 @@ import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpd
 import AddAndEditCarSizeModal from '../components/PredefinedValues/Cars/AddAndEditCarSizeModal.jsx';
 import { getCustomers, deleteCustomer } from '../database/APIs/CustomersApi.js';
 import { deleteCar, getCars } from '../database/APIs/CarsApi.js';
-import { getSizes, deleteSize } from '../database/APIs/CarSizeApi.js';
 
 const PredefinedValues = () => {
   const { t } = useTranslation();
@@ -25,14 +24,10 @@ const PredefinedValues = () => {
   const [loading, setLoading] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [cars, setCars] = useState([]);
-  const [carSizes, setCarSizes] = useState([]);
+
   const [addAndUpdateCarsModal, setAddAndUpdateCarsModal] = useState({
     open: false,
     car: null
-  });
-  const [addAndEditCarSizeModal, setAddAndEditCarSizeModal] = useState({
-    open: false,
-    size: null
   });
 
   const [addAndUpdateCustomersModal, setAddAndUpdateCustomersModal] = useState({
@@ -40,13 +35,14 @@ const PredefinedValues = () => {
     customer: null
   });
 
+  const [addAndEditCarSizeModal, setAddAndEditCarSizeModal] = useState(false);
+
   useEffect(() => {
     setLoading(true);
-    Promise.all([getCars(), getCustomers(), getSizes()])
-      .then(([carsData, customersData, sizesData]) => {
+    Promise.all([getCars(), getCustomers()])
+      .then(([carsData, customersData]) => {
         setCars(carsData);
         setCustomers(customersData);
-        setCarSizes(sizesData);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -176,6 +172,7 @@ const PredefinedValues = () => {
       )
     }
   ];
+
   const customersColumns = [
     {
       title: t('id'),
@@ -258,6 +255,7 @@ const PredefinedValues = () => {
       )
     }
   ];
+
   return (
     <>
       <Card
@@ -406,23 +404,10 @@ const PredefinedValues = () => {
         />
       ) : null}
 
-      {addAndEditCarSizeModal.open ? (
+      {addAndEditCarSizeModal ? (
         <AddAndEditCarSizeModal
-          open={addAndEditCarSizeModal.open}
-          size={addAndEditCarSizeModal.size}
-          carSizes={carSizes}
-          onClose={() => setAddAndEditCarSizeModal({ open: false, size: null })}
-          onDone={() => {
-            setLoading(true);
-            getSizes()
-              .then((data) => {
-                setCarSizes(data);
-              })
-              .catch((error) =>
-                console.error('Error fetching car sizes:', error)
-              )
-              .finally(() => setLoading(false));
-          }}
+          open={addAndEditCarSizeModal}
+          onClose={() => setAddAndEditCarSizeModal(false)}
         />
       ) : null}
     </>

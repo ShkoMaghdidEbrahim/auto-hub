@@ -617,5 +617,6 @@
   "are_you_sure_delete": "دڵنیایت کە دەتەوێت ئەم قەبارەی سەیارەیە بسڕیتەوە؟",
   "edit_car_size": "قەبارەی سەیارە",
   "add_registration": "تۆماری نوێ",
-  "edit_registration": "دەستکاریکردنی تۆمار"
+  "edit_registration": "دەستکاریکردنی تۆمار",
+  "error_fetching_vehicle_sizes": "هەڵە لە وەرگرتنی قەبارەکانی سەیارەدا"
 }

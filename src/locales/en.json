@@ -617,5 +617,6 @@
   "are_you_sure_delete": "Are you sure you want to delete this vehicle size?",
   "edit_car_size": "Edit Car Size",
   "add_registration": "Add Registration",
-  "edit_registration": "Edit Registration"
+  "edit_registration": "Edit Registration",
+  "error_fetching_vehicle_sizes": "Error fetching vehicle sizes"
 }
