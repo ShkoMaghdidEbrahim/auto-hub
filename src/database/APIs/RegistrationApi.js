@@ -1,6 +1,6 @@
 import { supabase } from '../supabase';
 import { getCustomers } from './CustomersApi';
-import { getSizes } from './CarSizeApi';
+import { getSizesEnum } from './CarsApi';
 
 export const getRegistrations = async () => {
   try {
@@ -12,7 +12,7 @@ export const getRegistrations = async () => {
         .eq('is_deleted', false)
         .order('created_at', { ascending: false }),
       getCustomers(),
-      getSizes()
+      getSizesEnum()
     ]);
 
     if (registrations.error) {

@@ -221,6 +221,7 @@ const TarqimMrur = () => {
               loading={loading}
               columns={registrationColumns}
               dataSource={registrationInfo}
+              rowKey="id"
               scroll={{
                 x: 'max-content'
               }}
