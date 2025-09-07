@@ -87,7 +87,7 @@ export const updateSize = async (id, sizeData) => {
 export const deleteSize = async (sizeId) => {
   const { error } = await supabase
     .from('vehicle_size_types')
-    .update({ deleted: true })
+    .update({ is_deleted: true })
     .eq('id', sizeId);
 
   if (error) {
