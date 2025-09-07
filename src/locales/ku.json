@@ -612,5 +612,6 @@
   "vehicle_size_deleted_successfully": "قەبارەی سەیارە بە سەرکەوتوویی سڕایەوە",
   "error_deleting_vehicle_size": "هەڵە لە سڕینەوەی قەبارەی سەیارەدا",
   "are_you_sure_delete": "دڵنیایت کە دەتەوێت ئەم قەبارەی سەیارەیە بسڕیتەوە؟",
-  "edit_car_size": "قەبارەی سەیارە"
+  "edit_car_size": "قەبارەی سەیارە",
+  "error_fetching_vehicle_sizes": "هەڵە لە وەرگرتنی قەبارەکانی سەیارەدا"
 }
