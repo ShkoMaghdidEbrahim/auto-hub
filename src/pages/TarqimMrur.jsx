@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   Card,
   Button,
-  Typography,
   Divider,
   Row,
   Col,
   Table,
-  Tag,
   Popconfirm,
   Space
 } from 'antd';
@@ -20,29 +18,22 @@ import {
 } from '../database/APIs/RegistrationApi';
 import { formatIQD } from '../helpers/formatMoney';
 
-const { Title } = Typography;
-
 const TarqimMrur = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [registrationInfo, setRegistrationInfo] = useState([]);
 
-  // Fetch registrations function
-  const fetchRegistrations = async () => {
-    try {
-      setLoading(true);
-      const data = await getRegistrations();
-      setRegistrationInfo(data);
-    } catch (error) {
-      console.error('Error fetching registrations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch registrations on component mount
   useEffect(() => {
-    fetchRegistrations();
+    getRegistrations()
+      .then((data) => {
+        setRegistrationInfo(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching registrations:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const [
@@ -53,7 +44,6 @@ const TarqimMrur = () => {
     registration: null
   });
 
-  // Define columns for the registrations table
   const registrationColumns = [
     {
       title: t('vin_number'),
@@ -141,7 +131,16 @@ const TarqimMrur = () => {
             onConfirm={() =>
               deleteRegistration(record.id)
                 .then(() => {
-                  fetchRegistrations();
+                  getRegistrations()
+                    .then((data) => {
+                      setRegistrationInfo(data);
+                    })
+                    .catch((error) => {
+                      console.error('Error fetching registrations:', error);
+                    })
+                    .finally(() => {
+                      setLoading(false);
+                    });
                 })
                 .catch((error) => {
                   console.error('Error deleting registration:', error);
@@ -165,14 +164,6 @@ const TarqimMrur = () => {
       )
     }
   ];
-
-  const showDrawer = () => {
-    setDrawerOpen(true);
-  };
-
-  const onDrawerClose = () => {
-    setDrawerOpen(false);
-  };
 
   return (
     <>
@@ -240,7 +231,18 @@ const TarqimMrur = () => {
               registration: null
             })
           }
-          onSuccess={fetchRegistrations}
+          onSuccess={() => {
+            getRegistrations()
+              .then((data) => {
+                setRegistrationInfo(data);
+              })
+              .catch((error) => {
+                console.error('Error fetching registrations:', error);
+              })
+              .finally(() => {
+                setLoading(false);
+              });
+          }}
         />
       ) : null}
     </>

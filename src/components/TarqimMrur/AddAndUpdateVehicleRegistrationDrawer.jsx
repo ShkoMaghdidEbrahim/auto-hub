@@ -40,115 +40,49 @@ const VehicleRegistrationDrawer = ({
 }) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
-  const [hasDebt, setHasDebt] = useState(false);
+  const [has_debt, setHasDebt] = useState(registration?.has_debt || false);
   const [cars, setCars] = useState([]);
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [carModels, setCarModels] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch data when component mounts
   useEffect(() => {
-    if (open) {
-      fetchCars();
-      fetchCustomers();
-    } else {
-      // Reset form when drawer is closed
-      form.resetFields();
-      setSelectedCar(null);
-    }
-  }, [open]);
-
-  // Pre-fill form when editing
-  useEffect(() => {
-    if (open && registration) {
-      console.log('Pre-filling form with registration data:', registration);
-
-      // Find the customer name from the customer object
-      const customerName = registration.customers?.full_name || '';
-
-      // Pre-fill the form with all available data
-      form.setFieldsValue({
-        customerId: customerName,
-        carName: registration.car_name,
-        model: registration.car_model,
-        cylinders: registration.number_of_cylinders,
-        vehicleSize: registration.vehicle_size,
-        color: registration.car_color,
-        vinNumber: registration.vin_number,
-        temporaryPlateNumber: registration.temporary_plate_number,
-        sizeFee: registration.size_fee,
-        numberPrice: registration.plate_number_cost,
-        legalPrice: registration.legal_cost,
-        examinePrice: registration.inspection_cost,
-        contractPrice: registration.electronic_contract_cost,
-        windowPrice: registration.window_check_cost,
-        expenses: registration.expenses,
-        fees: registration.expenses, // Map expenses to fees field
-        laborFees: registration.labor_fees,
-        total: registration.total,
-        note: registration.note,
-        hasDebt: registration.has_debt || false,
-        debtAmount: registration.debt_amount || 0
+    getCars()
+      .then((data) => {
+        setCars(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
-
-      // Set debt state if applicable
-      setHasDebt(registration.has_debt || false);
-
-      // Find and set the selected car
-      const car = cars.find((c) => c.car_name === registration.car_name);
-      if (car) {
-        setSelectedCar(car);
-      }
-    }
-  }, [open, registration, cars, form]);
-
-  const fetchCars = async () => {
-    try {
-      setLoading(true);
-      const carsData = await getCars();
-      console.log('Fetched cars data:', carsData);
-      console.log('Number of cars:', carsData?.length || 0);
-      setCars(carsData || []);
-    } catch (error) {
-      console.error('Error fetching cars:', error);
-      setCars([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCustomers = async () => {
-    try {
-      const customersData = await getCustomers();
-      console.log('Fetched customers data:', customersData);
-      console.log('Number of customers:', customersData?.length || 0);
-      setCustomers(customersData || []);
-    } catch (error) {
-      console.error('Error fetching customers:', error);
-      setCustomers([]);
-    }
-  };
+    getCustomers()
+      .then((data) => {
+        setCustomers(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   const handleCarSelect = (value, option) => {
-    console.log('Car selected:', { value, option, cars });
     const car = cars.find((c) => c.id === option?.key || c.car_name === value);
-    console.log('Found car:', car);
-    setSelectedCar(car);
 
-    // Auto-fill form fields based on selected car
     if (car) {
       form.setFieldsValue({
-        carName: car.car_name,
-        model: car.car_model,
-        cylinders: car.number_of_cylinders,
-        vehicleSize: car.vehicle_size,
-        sizeFee: car.size_fee,
-        numberPrice: car.plate_number_cost,
-        legalPrice: car.legal_cost,
-        examinePrice: car.inspection_cost,
-        contractPrice: car.electronic_contract_cost
+        car_name: car.car_name,
+        car_model: car.car_model,
+        number_of_cylinders: car.number_of_cylinders,
+        vehicle_size: car.vehicle_size,
+        size_fee: car.size_fee,
+        plate_number_cost: car.plate_number_cost,
+        legal_cost: car.legal_cost,
+        inspection_cost: car.inspection_cost,
+        electronic_contract_cost: car.electronic_contract_cost
       });
     }
   };
@@ -158,7 +92,6 @@ const VehicleRegistrationDrawer = ({
       setSubmitting(true);
       console.log('Form values:', values);
 
-      // Find customer ID from selected customer name
       console.log('Form customerId value:', values.customerId);
       console.log('Available customers:', customers);
       const selectedCustomer = customers.find(
@@ -168,51 +101,49 @@ const VehicleRegistrationDrawer = ({
       const customerId = selectedCustomer ? selectedCustomer.id : null;
       console.log('Final customer ID:', customerId);
 
-      // Map form values to database fields
       const registrationData = {
         customer_id: customerId,
-        vin_number: values.vinNumber,
-        temporary_plate_number: values.temporaryPlateNumber || null,
-        car_name: values.carName,
-        car_model: parseInt(values.model) || 0,
-        number_of_cylinders: parseInt(values.cylinders) || 0,
-        vehicle_size: parseInt(values.vehicleSize) || 0,
-        car_color: values.color,
-        size_fee: Math.round(parseFloat(values.sizeFee) || 0),
-        plate_number_cost: Math.round(parseFloat(values.numberPrice) || 0),
-        legal_cost: Math.round(parseFloat(values.legalPrice) || 0),
-        inspection_cost: Math.round(parseFloat(values.examinePrice) || 0),
-        electronic_contract_cost: Math.round(
-          parseFloat(values.contractPrice) || 0
+        vin_number: values.vin_number,
+        temporary_plate_number: values.temporary_plate_number || null,
+        car_name: values.car_name,
+        car_model: parseInt(values.car_model) || 0,
+        number_of_cylinders: parseInt(values.number_of_cylinders) || 0,
+        vehicle_size: parseInt(values.vehicle_size) || 0,
+        car_color: values.car_color,
+        size_fee: Math.round(parseFloat(values.size_fee) || 0),
+        plate_number_cost: Math.round(
+          parseFloat(values.plate_number_cost) || 0
         ),
-        window_check_cost: Math.round(parseFloat(values.windowPrice) || 0),
+        legal_cost: Math.round(parseFloat(values.legal_cost) || 0),
+        inspection_cost: Math.round(parseFloat(values.inspection_cost) || 0),
+        electronic_contract_cost: Math.round(
+          parseFloat(values.electronic_contract_cost) || 0
+        ),
+        window_check_cost: Math.round(
+          parseFloat(values.window_check_cost) || 0
+        ),
         expenses: Math.round(parseFloat(values.fees) || 0),
-        labor_fees: Math.round(parseFloat(values.laborFees) || 0),
+        labor_fees: Math.round(parseFloat(values.labor_fees) || 0),
         total: Math.round(parseFloat(values.total) || 0),
         note: values.note || null
       };
 
       console.log('Registration data to submit:', registrationData);
 
-      // Submit to database (create or update)
       if (registration) {
-        // Update existing registration
         await updateRegistration(registration.id, registrationData);
         console.log('Registration updated successfully');
       } else {
-        // Create new registration
         await addRegistration(registrationData);
         console.log('Registration created successfully');
       }
 
-      // Success - close drawer and refresh data
       form.resetFields();
-      setSelectedCar(null);
+
       onSuccess?.();
       onClose?.();
     } catch (error) {
       console.error('Error submitting registration:', error);
-      // You might want to show an error message to the user here
     } finally {
       setSubmitting(false);
     }
@@ -221,23 +152,22 @@ const VehicleRegistrationDrawer = ({
   const handleDebtChange = (e) => {
     setHasDebt(e.target.checked);
     if (!e.target.checked) {
-      form.setFieldsValue({ debtAmount: undefined });
+      form.setFieldsValue({ debt_amount: undefined });
     }
   };
 
-  // Calculate total from all money fields
   const calculateTotal = () => {
     const values = form.getFieldsValue();
     const moneyFields = [
-      'sizeFee',
-      'numberPrice',
-      'legalPrice',
-      'examinePrice',
-      'contractPrice',
-      'windowPrice',
+      'size_fee',
+      'plate_number_cost',
+      'legal_cost',
+      'inspection_cost',
+      'electronic_contract_cost',
+      'window_check_cost',
       'expenses',
       'fees',
-      'laborFees'
+      'labor_fees'
     ];
 
     const total = moneyFields.reduce((sum, field) => {
@@ -248,7 +178,6 @@ const VehicleRegistrationDrawer = ({
     form.setFieldsValue({ total: total.toFixed(2) });
   };
 
-  // Watch for changes in money fields to recalculate total
   const onMoneyFieldChange = () => {
     calculateTotal();
   };
@@ -273,8 +202,11 @@ const VehicleRegistrationDrawer = ({
           onFinish={onFinish}
           size="large"
           scrollToFirstError
+          initialValues={{
+            customerId: registration?.customers?.full_name,
+            ...registration
+          }}
         >
-          {/* Vehicle Information Section */}
           <Card
             title={
               <span>
@@ -288,10 +220,10 @@ const VehicleRegistrationDrawer = ({
             <Row gutter={[16, 16]}>
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
-                  label={t('customer')}
+                  label={t('customer_name')}
                   name="customerId"
                   rules={[
-                    { required: true, message: t('please_select_customer') }
+                    { required: true, message: t('customer_name_required') }
                   ]}
                 >
                   {customers && customers.length > 0 ? (
@@ -315,7 +247,7 @@ const VehicleRegistrationDrawer = ({
                     />
                   ) : (
                     <Input
-                      placeholder={t('enter_customer_name')}
+                      placeholder={t('customer_name')}
                       disabled={loading}
                     />
                   )}
@@ -325,14 +257,14 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('car_name')}
-                  name="carName"
+                  name="car_name"
                   rules={[
                     { required: true, message: t('please_enter_car_name') }
                   ]}
                 >
                   {cars && cars.length > 0 ? (
                     <Select
-                      placeholder={t('search_car_name')}
+                      placeholder={t('car_name')}
                       showSearch
                       allowClear
                       loading={loading}
@@ -364,8 +296,8 @@ const VehicleRegistrationDrawer = ({
 
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
-                  label={t('model')}
-                  name="model"
+                  label={t('car_model')}
+                  name="car_model"
                   rules={[{ required: true, message: t('please_enter_model') }]}
                 >
                   <InputNumber
@@ -380,7 +312,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('number_of_cylinders')}
-                  name="cylinders"
+                  name="number_of_cylinders"
                   rules={[
                     { required: true, message: t('please_enter_cylinders') }
                   ]}
@@ -397,7 +329,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('vehicle_size')}
-                  name="vehicleSize"
+                  name="vehicle_size"
                   rules={[
                     { required: true, message: t('please_enter_vehicle_size') }
                   ]}
@@ -413,7 +345,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('size_fee')}
-                  name="sizeFee"
+                  name="size_fee"
                   rules={[
                     { required: true, message: t('please_enter_size_fee') }
                   ]}
@@ -431,8 +363,8 @@ const VehicleRegistrationDrawer = ({
 
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
-                  label={t('color')}
-                  name="color"
+                  label={t('car_color')}
+                  name="car_color"
                   rules={[{ required: true, message: t('please_enter_color') }]}
                 >
                   <Input placeholder={t('enter_color')} />
@@ -442,7 +374,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('vin_number')}
-                  name="vinNumber"
+                  name="vin_number"
                   rules={[
                     { required: true, message: t('please_enter_vin_number') }
                   ]}
@@ -454,7 +386,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('temporary_number')}
-                  name="temporaryPlateNumber"
+                  name="temporary_plate_number"
                   rules={[
                     {
                       required: true,
@@ -483,7 +415,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('number_price')}
-                  name="numberPrice"
+                  name="plate_number_cost"
                   rules={[
                     { required: true, message: t('please_enter_number_price') }
                   ]}
@@ -502,7 +434,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('legal_price')}
-                  name="legalPrice"
+                  name="legal_cost"
                   rules={[
                     { required: true, message: t('please_enter_legal_price') }
                   ]}
@@ -521,7 +453,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('examine_price')}
-                  name="examinePrice"
+                  name="inspection_cost"
                   rules={[
                     { required: true, message: t('please_enter_examine_price') }
                   ]}
@@ -540,7 +472,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('contract_price')}
-                  name="contractPrice"
+                  name="electronic_contract_cost"
                   rules={[
                     {
                       required: true,
@@ -562,7 +494,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('window_price')}
-                  name="windowPrice"
+                  name="window_check_cost"
                   rules={[
                     { required: true, message: t('please_enter_window_price') }
                   ]}
@@ -617,7 +549,7 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('labor_fees')}
-                  name="laborFees"
+                  name="labor_fees"
                   rules={[
                     { required: true, message: t('please_enter_labor_fees') }
                   ]}
@@ -651,21 +583,21 @@ const VehicleRegistrationDrawer = ({
             {/* Debt Checkbox in Pricing Section */}
             <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
               <Col xs={24}>
-                <Form.Item name="hasDebt" valuePropName="checked">
+                <Form.Item name="has_debt" valuePropName="checked">
                   <Checkbox onChange={handleDebtChange}>
                     {t('has_outstanding_debt')}
                   </Checkbox>
                 </Form.Item>
               </Col>
 
-              {hasDebt && (
+              {has_debt && (
                 <Col xs={24} sm={12} md={8}>
                   <Form.Item
                     label={t('debt_amount')}
-                    name="debtAmount"
+                    name="debt_amount"
                     rules={[
                       {
-                        required: hasDebt,
+                        required: has_debt,
                         message: t('please_enter_debt_amount')
                       }
                     ]}
@@ -750,7 +682,7 @@ const VehicleRegistrationDrawer = ({
             <Col>
               <p
                 style={{
-                  color: '#666',
+                  car_color: '#666',
                   fontStyle: 'italic',
                   textAlign: 'center',
                   margin: 0

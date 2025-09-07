@@ -618,5 +618,12 @@
   "edit_car_size": "قەبارەی سەیارە",
   "add_registration": "تۆماری نوێ",
   "edit_registration": "دەستکاریکردنی تۆمار",
-  "error_fetching_vehicle_sizes": "هەڵە لە وەرگرتنی قەبارەکانی سەیارەدا"
+  "error_fetching_vehicle_sizes": "هەڵە لە وەرگرتنی قەبارەکانی سەیارەدا",
+  "car_color": "ڕەنگی ئۆتۆمبێل",
+  "update_registration": "نوێکردنەوەی تۆمار",
+  "create_registration": "دروستکردنی تۆمار",
+  "search_customer": "گەڕان بە دوای کڕیار",
+  "plate_number": "ژمارەی پلاتە",
+  "no_customer": "کڕیار نییە",
+  "no_size": "قەبارە نییە"
 }

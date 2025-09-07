@@ -618,5 +618,12 @@
   "edit_car_size": "Edit Car Size",
   "add_registration": "Add Registration",
   "edit_registration": "Edit Registration",
-  "error_fetching_vehicle_sizes": "Error fetching vehicle sizes"
+  "error_fetching_vehicle_sizes": "Error fetching vehicle sizes",
+  "car_color": "Car Color",
+  "update_registration": "Update Registration",
+  "create_registration": "Create Registration",
+  "search_customer": "Search Customer",
+  "plate_number": "Temporary Plate Number",
+  "no_customer": "No Customer",
+  "no_size": "No Size"
 }
