@@ -625,5 +625,9 @@
   "search_customer": "Search Customer",
   "plate_number": "Temporary Plate Number",
   "no_customer": "No Customer",
-  "no_size": "No Size"
+  "no_size": "No Size",
+  "transportation_fee": "Transportation Fee",
+  "import_system_fee": "Import System Fee",
+  "import_fee": "Import Fee",
+  "car_coc_fee": "Car COC Fee"
 }

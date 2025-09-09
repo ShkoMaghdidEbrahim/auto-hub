@@ -437,6 +437,116 @@ const AddAndUpdateCarsModal = ({ open, onClose, car, onDone }) => {
             </Space>
           </Col>
 
+          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+            <Space style={{ width: '100%' }} direction="vertical">
+              <Text
+                style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}
+              >
+                {t('import_fee')}
+              </Text>
+              <Form.Item
+                style={{ margin: 0 }}
+                name="import_fee"
+                rules={[{ required: false }]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder={t('amount')}
+                  min={0}
+                  step={250}
+                  parser={(value) => value.replace(/\D/g, '')}
+                  formatter={(value) => `${Number(value).toLocaleString()}`}
+                  addonBefore={'IQD'}
+                />
+              </Form.Item>
+            </Space>
+          </Col>
+
+          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+            <Space style={{ width: '100%' }} direction="vertical">
+              <Text
+                style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}
+              >
+                {t('import_system_fee')}
+              </Text>
+              <Form.Item
+                style={{ margin: 0 }}
+                name="import_system_fee"
+                rules={[{ required: false }]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder={t('amount')}
+                  min={0}
+                  step={250}
+                  parser={(value) => value.replace(/\D/g, '')}
+                  formatter={(value) => `${Number(value).toLocaleString()}`}
+                  addonBefore={'IQD'}
+                />
+              </Form.Item>
+            </Space>
+          </Col>
+
+          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+            <Space style={{ width: '100%' }} direction="vertical">
+              <Text
+                style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}
+              >
+                {t('car_coc_fee')}
+              </Text>
+              <Form.Item
+                style={{ margin: 0 }}
+                name="car_coc_fee"
+                rules={[{ required: false }]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder={t('amount')}
+                  min={0}
+                  step={0.01}
+                  precision={2}
+                  parser={(value) => value.replace(/[^\d.]/g, '')}
+                  formatter={(value) =>
+                    value
+                      ? `${Number(value).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+                      : ''
+                  }
+                  addonBefore={'USD'}
+                />
+              </Form.Item>
+            </Space>
+          </Col>
+
+          <Col xs={24} sm={12} md={12} lg={12} xl={12}>
+            <Space style={{ width: '100%' }} direction="vertical">
+              <Text
+                style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}
+              >
+                {t('transportation_fee')}
+              </Text>
+              <Form.Item
+                style={{ margin: 0 }}
+                name="transportation_fee"
+                rules={[{ required: false }]}
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  placeholder={t('amount')}
+                  min={0}
+                  step={0.01}
+                  precision={2}
+                  parser={(value) => value.replace(/[^\d.]/g, '')}
+                  formatter={(value) =>
+                    value
+                      ? `${Number(value).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+                      : ''
+                  }
+                  addonBefore={'USD'}
+                />
+              </Form.Item>
+            </Space>
+          </Col>
+
           <Col
             span={24}
             style={{

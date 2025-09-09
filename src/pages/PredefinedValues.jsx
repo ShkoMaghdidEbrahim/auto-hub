@@ -11,7 +11,7 @@ import {
 } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { formatIQD } from '../helpers/formatMoney.js';
+import { formatIQD, formatUSD } from '../helpers/formatMoney.js';
 import AddAndUpdateCustomersModal from '../components/PredefinedValues/Customers/AddAndUpdateCustomersModal.jsx';
 import AddAndUpdateCarsModal from '../components/PredefinedValues/Cars/AddAndUpdateCarsModal.jsx';
 import AddAndEditCarSizeModal from '../components/PredefinedValues/Cars/AddAndEditCarSizeModal.jsx';
@@ -86,6 +86,30 @@ const PredefinedValues = () => {
       dataIndex: 'size_fee',
       key: 'size_fee',
       render: (value) => formatIQD(value)
+    },
+    {
+      title: t('import_fee'),
+      dataIndex: 'import_fee',
+      key: 'import_fee',
+      render: (value) => formatIQD(value)
+    },
+    {
+      title: t('import_system_fee'),
+      dataIndex: 'import_system_fee',
+      key: 'import_system_fee',
+      render: (value) => formatIQD(value)
+    },
+    {
+      title: t('car_coc_fee'),
+      dataIndex: 'car_coc_fee',
+      key: 'car_coc_fee',
+      render: (value) => formatUSD(value)
+    },
+    {
+      title: t('transportation_fee'),
+      dataIndex: 'transportation_fee',
+      key: 'transportation_fee',
+      render: (value) => formatUSD(value)
     },
     {
       title: t('plate_number_cost'),
@@ -172,7 +196,6 @@ const PredefinedValues = () => {
       )
     }
   ];
-
   const customersColumns = [
     {
       title: t('id'),

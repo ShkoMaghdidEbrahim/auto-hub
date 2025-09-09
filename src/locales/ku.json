@@ -625,5 +625,9 @@
   "search_customer": "گەڕان بە دوای کڕیار",
   "plate_number": "ژمارەی پلاتە",
   "no_customer": "کڕیار نییە",
-  "no_size": "قەبارە نییە"
+  "no_size": "قەبارە نییە",
+  "transportation_fee": "نەقڵ",
+  "import_system_fee": "سیستەگی گومرت",
+  "import_fee": "گومرگ",
+  "car_coc_fee": "تەخلیس COC"
 }
