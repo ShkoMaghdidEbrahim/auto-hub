@@ -351,11 +351,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_size_fee')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -421,11 +423,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_number_price')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -440,11 +444,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_legal_price')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -459,11 +465,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_examine_price')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -481,11 +489,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_contract_price')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -500,11 +510,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_window_price')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -519,11 +531,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_expenses')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -536,11 +550,13 @@ const VehicleRegistrationDrawer = ({
                   rules={[{ required: true, message: t('please_enter_fees') }]}
                 >
                   <InputNumber
-                    placeholder={t('enter_fees')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -555,11 +571,13 @@ const VehicleRegistrationDrawer = ({
                   ]}
                 >
                   <InputNumber
-                    placeholder={t('enter_labor_fees')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
-                    precision={2}
-                    prefix="$"
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
                   />
                 </Form.Item>
@@ -568,11 +586,14 @@ const VehicleRegistrationDrawer = ({
               <Col xs={24} sm={12} md={8}>
                 <Form.Item label={t('total_auto_calculated')} name="total">
                   <InputNumber
-                    placeholder={t('total_calculated_automatically')}
                     style={{ width: '100%' }}
+                    placeholder={t('amount')}
                     min={0}
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
                     precision={2}
-                    prefix="$"
                     readOnly
                     value={0}
                   />
@@ -603,11 +624,13 @@ const VehicleRegistrationDrawer = ({
                     ]}
                   >
                     <InputNumber
-                      placeholder={t('enter_debt_amount')}
                       style={{ width: '100%' }}
+                      placeholder={t('amount')}
                       min={0}
-                      precision={2}
-                      prefix="$"
+                      step={250}
+                      parser={(value) => value.replace(/\D/g, '')}
+                      formatter={(value) => `${Number(value).toLocaleString()}`}
+                      addonBefore={'IQD'}
                     />
                   </Form.Item>
                 </Col>
@@ -675,21 +698,6 @@ const VehicleRegistrationDrawer = ({
                   ? t('update_registration')
                   : t('create_registration')}
               </Button>
-            </Col>
-          </Row>
-
-          <Row justify="center" style={{ marginTop: '16px' }}>
-            <Col>
-              <p
-                style={{
-                  car_color: '#666',
-                  fontStyle: 'italic',
-                  textAlign: 'center',
-                  margin: 0
-                }}
-              >
-                {t('submit_disabled_message')}
-              </p>
             </Col>
           </Row>
         </Form>
