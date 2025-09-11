@@ -23,6 +23,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { getCars } from '../../database/APIs/CarsApi';
+import { getSizesEnum } from '../../database/APIs/CarsApi';
 import {
   addRegistration,
   updateRegistration
@@ -43,8 +44,12 @@ const VehicleRegistrationDrawer = ({
   const [has_debt, setHasDebt] = useState(registration?.has_debt || false);
   const [cars, setCars] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [vehicleSizes, setVehicleSizes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedCarName, setSelectedCarName] = useState(
+    registration?.car_name || null
+  );
 
   useEffect(() => {
     getCars()
@@ -57,6 +62,10 @@ const VehicleRegistrationDrawer = ({
       .finally(() => {
         setLoading(false);
       });
+    getSizesEnum()
+      .then((data) => setVehicleSizes(data))
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false));
     getCustomers()
       .then((data) => {
         setCustomers(data);
@@ -68,6 +77,13 @@ const VehicleRegistrationDrawer = ({
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    // Sync selected car name when editing an existing registration
+    if (registration?.car_name) {
+      setSelectedCarName(registration.car_name);
+    }
+  }, [registration]);
 
   const handleCarSelect = (value, option) => {
     const car = cars.find((c) => c.id === option?.key || c.car_name === value);
@@ -146,6 +162,34 @@ const VehicleRegistrationDrawer = ({
       console.error('Error submitting registration:', error);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const onCarNameSelect = (value) => {
+    setSelectedCarName(value);
+    // Reset year selection so user must pick the specific car
+    form.setFieldsValue({ car_name: value, car_model: undefined });
+  };
+
+  const onCarYearSelect = (yearValue) => {
+    const numericYear = parseInt(yearValue);
+    const car = cars.find(
+      (c) =>
+        c.car_name === selectedCarName && parseInt(c.car_model) === numericYear
+    );
+
+    if (car) {
+      form.setFieldsValue({
+        car_name: car.car_name,
+        car_model: car.car_model,
+        number_of_cylinders: car.number_of_cylinders,
+        vehicle_size: car.vehicle_size,
+        size_fee: car.size_fee,
+        plate_number_cost: car.plate_number_cost,
+        legal_cost: car.legal_cost,
+        inspection_cost: car.inspection_cost,
+        electronic_contract_cost: car.electronic_contract_cost
+      });
     }
   };
 
@@ -268,16 +312,10 @@ const VehicleRegistrationDrawer = ({
                       showSearch
                       allowClear
                       loading={loading}
-                      options={
-                        cars?.map((car) => ({
-                          value: car.car_name,
-                          label: car.car_name,
-                          key: car.id
-                        })) || []
-                      }
-                      onSelect={(value, option) =>
-                        handleCarSelect(value, option)
-                      }
+                      options={Array.from(
+                        new Set(cars.map((c) => c.car_name))
+                      ).map((name) => ({ value: name, label: name }))}
+                      onSelect={onCarNameSelect}
                       filterOption={(input, option) =>
                         (option?.label ?? '')
                           .toLowerCase()
@@ -300,12 +338,37 @@ const VehicleRegistrationDrawer = ({
                   name="car_model"
                   rules={[{ required: true, message: t('please_enter_model') }]}
                 >
-                  <InputNumber
-                    placeholder={t('enter_model')}
-                    style={{ width: '100%' }}
-                    min={1900}
-                    max={2030}
-                  />
+                  {cars && cars.length > 0 ? (
+                    <Select
+                      placeholder={t('enter_model')}
+                      showSearch
+                      allowClear
+                      disabled={!selectedCarName}
+                      options={Array.from(
+                        new Set(
+                          cars
+                            .filter((c) => c.car_name === selectedCarName)
+                            .map((c) => parseInt(c.car_model))
+                        )
+                      )
+                        .sort((a, b) => b - a)
+                        .map((year) => ({ value: year, label: String(year) }))}
+                      onSelect={onCarYearSelect}
+                      filterOption={(input, option) =>
+                        (option?.label ?? '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      style={{ width: '100%' }}
+                    />
+                  ) : (
+                    <InputNumber
+                      placeholder={t('enter_model')}
+                      style={{ width: '100%' }}
+                      min={1900}
+                      max={2030}
+                    />
+                  )}
                 </Form.Item>
               </Col>
 
@@ -334,11 +397,30 @@ const VehicleRegistrationDrawer = ({
                     { required: true, message: t('please_enter_vehicle_size') }
                   ]}
                 >
-                  <InputNumber
-                    placeholder={t('enter_vehicle_size')}
-                    style={{ width: '100%' }}
-                    min={0}
-                  />
+                  {vehicleSizes && vehicleSizes.length > 0 ? (
+                    <Select
+                      placeholder={t('enter_vehicle_size')}
+                      showSearch
+                      allowClear
+                      loading={loading}
+                      options={vehicleSizes.map((size) => ({
+                        value: size.id,
+                        label: size.name
+                      }))}
+                      filterOption={(input, option) =>
+                        (option?.label ?? '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      style={{ width: '100%' }}
+                    />
+                  ) : (
+                    <InputNumber
+                      placeholder={t('enter_vehicle_size')}
+                      style={{ width: '100%' }}
+                      min={0}
+                    />
+                  )}
                 </Form.Item>
               </Col>
 

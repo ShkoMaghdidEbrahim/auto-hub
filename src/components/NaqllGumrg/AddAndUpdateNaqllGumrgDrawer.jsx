@@ -28,6 +28,7 @@ import {
 } from '../../database/APIs/NaqllGumrgApi';
 import { getCustomers } from '../../database/APIs/CustomersApi';
 import { getCars } from '../../database/APIs/CarsApi';
+import { getSizesEnum } from '../../database/APIs/CarsApi';
 
 const { Title } = Typography;
 const { TextArea } = Input;
@@ -40,13 +41,18 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedCarName, setSelectedCarName] = useState(
+    record?.car_name || null
+  );
+  const [vehicleSizes, setVehicleSizes] = useState([]);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([getCars(), getCustomers()])
-      .then(([carsData, customersData]) => {
+    Promise.all([getCars(), getCustomers(), getSizesEnum()])
+      .then(([carsData, customersData, sizes]) => {
         setCars(carsData || []);
         setCustomers(customersData || []);
+        setVehicleSizes(sizes || []);
       })
       .catch((error) => {
         console.error('Error loading data:', error);
@@ -67,6 +73,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
         date: record.date ? dayjs(record.date) : dayjs()
       });
       setHasDebt(record.has_debt || false);
+      setSelectedCarName(record.car_name || null);
     } else if (!record) {
       form.setFieldsValue({
         date: dayjs(),
@@ -75,8 +82,17 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
     }
   }, [record, customers, form]);
 
-  const handleCarSelect = (value, option) => {
-    const car = cars.find((c) => c.id === option?.key || c.car_name === value);
+  const onCarNameSelect = (value) => {
+    setSelectedCarName(value);
+    form.setFieldsValue({ car_name: value, car_model: undefined });
+  };
+
+  const onCarYearSelect = (yearValue) => {
+    const numericYear = parseInt(yearValue);
+    const car = cars.find(
+      (c) =>
+        c.car_name === selectedCarName && parseInt(c.car_model) === numericYear
+    );
 
     if (car) {
       form.setFieldsValue({
@@ -89,7 +105,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
         car_coc_fee: car.car_coc_fee,
         transportation_fee: car.transportation_fee
       });
-      // Trigger total calculation after setting values
       setTimeout(() => {
         calculateTotal();
       }, 100);
@@ -325,16 +340,10 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                       showSearch
                       allowClear
                       loading={loading}
-                      options={
-                        cars?.map((car) => ({
-                          value: car.car_name,
-                          label: car.car_name,
-                          key: car.id
-                        })) || []
-                      }
-                      onSelect={(value, option) =>
-                        handleCarSelect(value, option)
-                      }
+                      options={Array.from(
+                        new Set(cars.map((c) => c.car_name))
+                      ).map((name) => ({ value: name, label: name }))}
+                      onSelect={onCarNameSelect}
                       filterOption={(input, option) =>
                         (option?.label ?? '')
                           .toLowerCase()
@@ -357,12 +366,37 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                   name="car_model"
                   rules={[{ required: true, message: t('please_enter_model') }]}
                 >
-                  <InputNumber
-                    placeholder={t('enter_model')}
-                    style={{ width: '100%' }}
-                    min={1900}
-                    max={2030}
-                  />
+                  {cars && cars.length > 0 ? (
+                    <Select
+                      placeholder={t('enter_model')}
+                      showSearch
+                      allowClear
+                      disabled={!selectedCarName}
+                      options={Array.from(
+                        new Set(
+                          cars
+                            .filter((c) => c.car_name === selectedCarName)
+                            .map((c) => parseInt(c.car_model))
+                        )
+                      )
+                        .sort((a, b) => b - a)
+                        .map((year) => ({ value: year, label: String(year) }))}
+                      onSelect={onCarYearSelect}
+                      filterOption={(input, option) =>
+                        (option?.label ?? '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      style={{ width: '100%' }}
+                    />
+                  ) : (
+                    <InputNumber
+                      placeholder={t('enter_model')}
+                      style={{ width: '100%' }}
+                      min={1900}
+                      max={2030}
+                    />
+                  )}
                 </Form.Item>
               </Col>
 
@@ -391,11 +425,30 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                     { required: true, message: t('please_enter_vehicle_size') }
                   ]}
                 >
-                  <InputNumber
-                    placeholder={t('enter_vehicle_size')}
-                    style={{ width: '100%' }}
-                    min={0}
-                  />
+                  {vehicleSizes && vehicleSizes.length > 0 ? (
+                    <Select
+                      placeholder={t('enter_vehicle_size')}
+                      showSearch
+                      allowClear
+                      loading={loading}
+                      options={vehicleSizes.map((size) => ({
+                        value: size.id,
+                        label: size.name
+                      }))}
+                      filterOption={(input, option) =>
+                        (option?.label ?? '')
+                          .toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                      style={{ width: '100%' }}
+                    />
+                  ) : (
+                    <InputNumber
+                      placeholder={t('enter_vehicle_size')}
+                      style={{ width: '100%' }}
+                      min={0}
+                    />
+                  )}
                 </Form.Item>
               </Col>
 
