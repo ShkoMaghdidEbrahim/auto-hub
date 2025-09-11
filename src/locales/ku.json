@@ -660,5 +660,12 @@
   "update_record": "نوێکردنەوەی تۆمار",
   "record_updated_successfully": "تۆمار بە سەرکەوتوویی نوێکرایەوە",
   "record_created_successfully": "تۆمار بە سەرکەوتوویی دروستکرا",
-  "error_saving_record": "هەڵە لە پاشەکەوتکردنی تۆماردا"
+  "error_saving_record": "هەڵە لە پاشەکەوتکردنی تۆماردا",
+  "please_enter_paid_amount": "please_enter_paid_amount",
+  "paid_amount": "paid_amount",
+  "please_write_batch_name": "please_write_batch_name",
+  "batch_name": "batch_name",
+  "select_batch": "select_batch",
+  "please_select_batch": "please_select_batch",
+  "batch": "batch"
 }

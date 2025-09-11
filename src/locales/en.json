@@ -659,5 +659,12 @@
   "update_record": "Update Record",
   "record_updated_successfully": "Record updated successfully",
   "record_created_successfully": "Record created successfully",
-  "error_saving_record": "Error saving record"
+  "error_saving_record": "Error saving record",
+  "please_enter_paid_amount": "please_enter_paid_amount",
+  "paid_amount": "paid_amount",
+  "please_write_batch_name": "please_write_batch_name",
+  "batch_name": "batch_name",
+  "select_batch": "select_batch",
+  "please_select_batch": "please_select_batch",
+  "batch": "batch"
 }

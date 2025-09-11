@@ -53,7 +53,7 @@ const TarqimMrur = () => {
     },
     {
       title: t('customer_name'),
-      dataIndex: 'customers',
+      dataIndex: 'customer',
       key: 'full_name',
       width: 120,
       render: (customer) => customer?.full_name || t('no_customer')
