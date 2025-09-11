@@ -72,7 +72,7 @@ const TarqimMrur = () => {
     },
     {
       title: t('vehicle_size'),
-      dataIndex: 'vehicle_size_types',
+      dataIndex: 'vehicle_size_type',
       key: 'vehicle_size',
       width: 120,
       render: (vehicleSize) => vehicleSize?.name || t('no_size')
