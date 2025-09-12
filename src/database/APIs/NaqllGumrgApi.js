@@ -19,7 +19,7 @@ export const getCustomerBatches = async (customerId) => {
   }
 };
 
-// Get all import/transportation records
+// Fixed function name to match what's used in NaqllGumrg.jsx
 export const getImportTransportationRecords = async () => {
   try {
     // Fetch all data in parallel
@@ -64,7 +64,7 @@ export const getImportTransportationRecords = async () => {
   }
 };
 
-// Add a new import/transportation record
+// Fixed function name to match what's used in AddAndUpdateNaqllGumrgDrawer.jsx
 export const addNaqllGumrgRecord = async (recordData, otherData) => {
   try {
     let batchId = null;
@@ -152,7 +152,7 @@ export const addNaqllGumrgRecord = async (recordData, otherData) => {
   }
 };
 
-// Update an existing import/transportation record
+// Fixed function name to match what's used in AddAndUpdateNaqllGumrgDrawer.jsx
 export const updateNaqllGumrgRecord = async (recordId, recordData, otherData) => {
   try {
     // Handle batch updates if needed
@@ -204,7 +204,7 @@ export const updateNaqllGumrgRecord = async (recordId, recordData, otherData) =>
   }
 };
 
-// Delete an import/transportation record (soft delete)
+// Fixed function name to match what's used in ImportTransportation.jsx
 export const deleteImportTransportationRecord = async (recordId) => {
   try {
     const { error } = await supabase
@@ -225,7 +225,7 @@ export const deleteImportTransportationRecord = async (recordId) => {
   }
 };
 
-// Get single record by ID
+// Get single record by ID (useful for editing)
 export const getImportTransportationRecord = async (recordId) => {
   try {
     const { data, error } = await supabase
