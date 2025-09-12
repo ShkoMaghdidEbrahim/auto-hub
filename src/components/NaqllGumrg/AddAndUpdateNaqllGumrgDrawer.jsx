@@ -49,8 +49,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
   const [vehicleSizes, setVehicleSizes] = useState([]);
   const [customerBatches, setCustomerBatches] = useState([]);
 
-  const total_iqd = form.getFieldValue('total_iqd');
-  const total_usd = form.getFieldValue('total_usd');
   const customerId = form.getFieldValue('customerId');
 
   useEffect(() => {
@@ -86,12 +84,12 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
   // Set form values when record changes
   useEffect(() => {
     if (record && customers.length > 0) {
+      const customerName = record.customers?.full_name;
       form.setFieldsValue({
-        customerId: record.customer_id,
+        customerId: record.customer_id, // Use customer ID instead of name
         ...record,
         date: record.date ? dayjs(record.date) : dayjs(),
-        old_batch: !!record.batch,
-        has_debt: record.has_debt || false
+        old_batch: !!record.batch
       });
       setHasDebt(record.has_debt || false);
       setOldBatch(!!record.batch);
@@ -99,8 +97,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
     } else if (!record) {
       form.setFieldsValue({
         date: dayjs(),
-        exchange_rate: 1500,
-        has_debt: false
+        exchange_rate: 1500
       });
     }
   }, [record, customers, form]);
@@ -121,8 +118,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       form.setFieldsValue({
         car_name: car.car_name,
         car_model: car.car_model,
-        number_of_cylinders: car.number_of_cylinders,
-        vehicle_size: car.vehicle_size,
         import_fee: car.import_fee,
         import_system_fee: car.import_system_fee,
         car_coc_fee: car.car_coc_fee,
@@ -153,19 +148,13 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       const naqllGumrgData = {
         customer_id: values.customerId,
         vin_number: values.vin_number || null,
-        temporary_plate_number: values.temporary_plate_number || null,
         car_name: values.car_name || null,
         car_model: toInteger(values.car_model),
-        number_of_cylinders: toInteger(values.number_of_cylinders),
-        vehicle_size: toInteger(values.vehicle_size),
         car_color: values.car_color || null,
         import_fee: Math.round(toNumber(values.import_fee)),
         import_system_fee: Math.round(toNumber(values.import_system_fee)),
-        car_coc_fee: Math.round(toNumber(values.car_coc_fee) * 100) / 100,
+        car_coc_fee: Math.round(toNumber(values.car_coc_fee) * 100) / 100, // Keep 2 decimal places
         transportation_fee: Math.round(toNumber(values.transportation_fee) * 100) / 100,
-        window_check_cost: Math.round(toNumber(values.window_check_cost)),
-        expenses: Math.round(toNumber(values.expenses)),
-        labor_fees: Math.round(toNumber(values.labor_fees)),
         total_usd: Math.round(toNumber(values.total_usd) * 100) / 100,
         total_iqd: Math.round(toNumber(values.total_iqd)),
         paid_amount_usd: Math.round(toNumber(values.paid_amount_usd) * 100) / 100,
@@ -178,9 +167,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
         has_debt: has_debt || false,
         old_batch: oldBatch,
         batch_id: values.batch_id || null,
-        batch_name: values.batch_name || null,
-        // Add paid_amount for debt tracking similar to VehicleRegistration
-        paid_amount: values.paid_amount || null
+        batch_name: values.batch_name || null
       };
 
       console.log('NaqllGumrg data to submit:', naqllGumrgData);
@@ -218,7 +205,13 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       onClose?.();
     } catch (error) {
       console.error('Error submitting NaqllGumrg record:', error);
-      message.error(t('error_saving_record'));
+
+      // More specific error handling
+      if (error.message) {
+        message.error(`${t('error_saving_record')}: ${error.message}`);
+      } else {
+        message.error(t('error_saving_record'));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -227,7 +220,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
   const handleDebtChange = (e) => {
     setHasDebt(e.target.checked);
     if (!e.target.checked) {
-      form.setFieldsValue({ paid_amount: undefined });
+      form.setFieldsValue({ debt_amount: undefined });
     }
   };
 
@@ -247,9 +240,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
     const iqdFields = [
       'import_fee',
       'import_system_fee',
-      'window_check_cost',
-      'expenses',
-      'labor_fees'
     ];
 
     const totalUsd = usdFields.reduce((sum, field) => {
@@ -327,7 +317,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                       loading={loading}
                       options={
                         customers?.map((customer) => ({
-                          value: customer.id,
+                          value: customer.id, // Use customer ID instead of name
                           label: customer.full_name,
                           key: customer.id
                         })) || []
@@ -422,57 +412,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                 </Form.Item>
               </Col>
 
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label={t('number_of_cylinders')}
-                  name="number_of_cylinders"
-                  rules={[
-                    { required: true, message: t('please_enter_cylinders') }
-                  ]}
-                >
-                  <InputNumber
-                    placeholder={t('enter_cylinders')}
-                    style={{ width: '100%' }}
-                    min={1}
-                    max={16}
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label={t('vehicle_size')}
-                  name="vehicle_size"
-                  rules={[
-                    { required: true, message: t('please_enter_vehicle_size') }
-                  ]}
-                >
-                  {vehicleSizes && vehicleSizes.length > 0 ? (
-                    <Select
-                      placeholder={t('enter_vehicle_size')}
-                      showSearch
-                      allowClear
-                      loading={loading}
-                      options={vehicleSizes.map((size) => ({
-                        value: size.id,
-                        label: size.name
-                      }))}
-                      filterOption={(input, option) =>
-                        (option?.label ?? '')
-                          .toLowerCase()
-                          .includes(input.toLowerCase())
-                      }
-                      style={{ width: '100%' }}
-                    />
-                  ) : (
-                    <InputNumber
-                      placeholder={t('enter_vehicle_size')}
-                      style={{ width: '100%' }}
-                      min={0}
-                    />
-                  )}
-                </Form.Item>
-              </Col>
 
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
@@ -493,21 +432,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                   ]}
                 >
                   <Input placeholder={t('enter_vin_number')} />
-                </Form.Item>
-              </Col>
-
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label={t('temporary_number')}
-                  name="temporary_plate_number"
-                  rules={[
-                    {
-                      required: true,
-                      message: t('please_enter_temporary_number')
-                    }
-                  ]}
-                >
-                  <Input placeholder={t('enter_temporary_number')} />
                 </Form.Item>
               </Col>
             </Row>
@@ -596,7 +520,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                 </Form.Item>
               </Col>
 
-              <Col xs={24} sm={12} md={8}>
+              <Col xs={24} sm={12} md={6}>
                 <Form.Item
                   label={t('transportation_fee')}
                   name="transportation_fee"
@@ -624,26 +548,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Form.Item
-                  label={t('expenses')}
-                  name="expenses"
-                  rules={[
-                    { required: true, message: t('please_enter_expenses') }
-                  ]}
-                >
-                  <InputNumber
-                    style={{ width: '100%' }}
-                    placeholder={t('amount')}
-                    min={0}
-                    step={250}
-                    parser={(value) => value.replace(/\D/g, '')}
-                    formatter={(value) => `${Number(value).toLocaleString()}`}
-                    addonBefore={'IQD'}
-                    onChange={onMoneyFieldChange}
-                  />
-                </Form.Item>
-              </Col>
+
               <Col xs={24} sm={12} md={8}>
                 <Form.Item label={t('exchange_rate')} name="exchange_rate">
                   <InputNumber
@@ -660,57 +565,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                 </Form.Item>
               </Col>
             </Row>
-            
-            {/* Debt Checkbox in Pricing Section */}
-            {!record ? (
-              <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
-                <Col xs={24}>
-                  <Form.Item name="has_debt" valuePropName="checked">
-                    <Checkbox onChange={handleDebtChange}>
-                      {t('has_outstanding_debt')}
-                    </Checkbox>
-                  </Form.Item>
-                </Col>
-
-                {has_debt && (
-                  <Col xs={24} sm={12} md={8}>
-                    <Form.Item
-                      label={t('paid_amount')}
-                      name="paid_amount"
-                      rules={[
-                        {
-                          required: has_debt,
-                          message: t('please_enter_paid_amount')
-                        },
-                        {
-                          validator: (_, value) => {
-                            if (value > total_iqd) {
-                              return Promise.reject(
-                                new Error(t('paid_amount_cannot_exceed_total'))
-                              );
-                            }
-                            return Promise.resolve();
-                          }
-                        }
-                      ]}
-                    >
-                      <InputNumber
-                        style={{ width: '100%' }}
-                        placeholder={t('amount')}
-                        min={0}
-                        step={250}
-                        max={total_iqd}
-                        parser={(value) => value.replace(/\D/g, '')}
-                        formatter={(value) =>
-                          `${Number(value).toLocaleString()}`
-                        }
-                        addonBefore={'IQD'}
-                      />
-                    </Form.Item>
-                  </Col>
-                )}
-              </Row>
-            ) : null}
           </Card>
 
           {/* Totals and Payments Section */}
@@ -762,6 +616,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                     precision={2}
                     prefix="$"
                     readOnly
+                    value={0}
                   />
                 </Form.Item>
               </Col>
@@ -780,6 +635,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                     }
                     parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                     readOnly
+                    value={0}
                   />
                 </Form.Item>
               </Col>
@@ -853,20 +709,18 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                       </Form.Item>
                     </Col>
                   ) : (
-                    <Col xs={24} sm={12} md={8}>
-                      <Form.Item
-                        label={t('batch_name')}
-                        name="batch_name"
-                        rules={[
-                          {
-                            required: !oldBatch,
-                            message: t('please_write_batch_name')
-                          }
-                        ]}
-                      >
-                        <Input placeholder={t('batch_name')} />
-                      </Form.Item>
-                    </Col>
+                    <Form.Item
+                      label={t('batch_name')}
+                      name="batch_name"
+                      rules={[
+                        {
+                          required: oldBatch,
+                          message: t('please_write_batch_name')
+                        }
+                      ]}
+                    >
+                      <Input placeholder={t('batch_name')} />
+                    </Form.Item>
                   )}
                 </Row>
               </Col>
