@@ -12,6 +12,7 @@ import {
   Select,
   DatePicker
 } from 'antd';
+import dayjs from 'dayjs';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -132,7 +133,13 @@ const TarqimMrur = () => {
   }, [registrationInfo]);
 
   const uniqueBatches = useMemo(() => {
+    // If no customer is selected, return empty array
+    if (!filters.customer) {
+      return [];
+    }
+
     const batches = registrationInfo
+      .filter((item) => item.customer?.id === filters.customer) // Filter by selected customer
       .map((item) => item.batch)
       .filter((batch) => batch)
       .reduce((acc, batch) => {
@@ -142,7 +149,7 @@ const TarqimMrur = () => {
         return acc;
       }, []);
     return batches;
-  }, [registrationInfo]);
+  }, [registrationInfo, filters.customer]);
 
   const uniqueVehicleSizes = useMemo(() => {
     const sizes = registrationInfo
@@ -255,8 +262,8 @@ const TarqimMrur = () => {
       }
 
       if (filters.dateRange && filters.dateRange.length === 2) {
-        const startDate = filters.dateRange[0].toLocaleDateString();
-        const endDate = filters.dateRange[1].toLocaleDateString();
+        const startDate = dayjs(filters.dateRange[0]).format('DD/MM/YYYY');
+        const endDate = dayjs(filters.dateRange[1]).format('DD/MM/YYYY');
         doc.text(
           `${t('date_range')}: ${startDate} - ${endDate}`,
           20,
@@ -632,7 +639,11 @@ const TarqimMrur = () => {
                     placeholder={t('customer_name')}
                     value={filters.customer}
                     onChange={(value) =>
-                      setFilters((prev) => ({ ...prev, customer: value }))
+                      setFilters((prev) => ({
+                        ...prev,
+                        customer: value,
+                        batch: null // Clear batch filter when customer changes
+                      }))
                     }
                     allowClear
                     showSearch
@@ -655,13 +666,18 @@ const TarqimMrur = () => {
                 </Col>
                 <Col xs={24} sm={12} md={8} lg={6}>
                   <Select
-                    placeholder={t('batch_name')}
+                    placeholder={
+                      filters.customer
+                        ? t('batch_name')
+                        : `${t('batch_name')} (${t('customer_name')})`
+                    }
                     value={filters.batch}
                     onChange={(value) =>
                       setFilters((prev) => ({ ...prev, batch: value }))
                     }
                     allowClear
                     showSearch
+                    disabled={!filters.customer}
                     filterOption={(input, option) =>
                       option?.children
                         ?.toLowerCase()
