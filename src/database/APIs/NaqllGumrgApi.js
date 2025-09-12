@@ -10,7 +10,7 @@ export const getCustomerBatches = async (customerId) => {
       .eq('customer_id', customerId)
       .eq('batch_type', 'import_and_transportation')
       .order('created_at', { ascending: false });
-    
+
     if (error) throw error;
     return data || [];
   } catch (error) {
@@ -20,13 +20,16 @@ export const getCustomerBatches = async (customerId) => {
 };
 
 // Fixed function name to match what's used in NaqllGumrg.jsx
+// ... existing code ...
+
 export const getImportTransportationRecords = async () => {
   try {
     // Fetch all data in parallel
     const [importTransportationRecords, customers] = await Promise.all([
       supabase
         .from('import_and_transportation')
-        .select(`
+        .select(
+          `
           *,
           batches (
             id,
@@ -34,29 +37,33 @@ export const getImportTransportationRecords = async () => {
             batch_type,
             created_at
           )
-        `)
+        `
+        )
         .eq('is_deleted', false)
         .order('created_at', { ascending: false }),
       getCustomers()
     ]);
-   
+
     if (importTransportationRecords.error) {
-      console.error('Error fetching import transportation records:', importTransportationRecords.error);
+      console.error(
+        'Error fetching import transportation records:',
+        importTransportationRecords.error
+      );
       throw importTransportationRecords.error;
     }
-   
-    // Manually join the data
+
+    // Manually join the data - FIXED: use "customer" instead of "customers"
     const enrichedRecords = importTransportationRecords.data.map((record) => {
       const customer = customers.find(
         (customer) => customer.id === record.customer_id
       );
       return {
         ...record,
-        customers: customer || null,
+        customer: customer || null, // Changed from customers to customer
         batch: record.batches || null
       };
     });
-   
+
     return enrichedRecords;
   } catch (error) {
     console.error('Error fetching import transportation records:', error);
@@ -64,11 +71,13 @@ export const getImportTransportationRecords = async () => {
   }
 };
 
+// ... rest of the file ...
+
 // Fixed function name to match what's used in AddAndUpdateNaqllGumrgDrawer.jsx
 export const addNaqllGumrgRecord = async (recordData, otherData) => {
   try {
     let batchId = null;
-    
+
     // Handle batch creation/selection
     if (otherData && otherData.old_batch && otherData.batch_id) {
       // Use existing batch
@@ -84,7 +93,7 @@ export const addNaqllGumrgRecord = async (recordData, otherData) => {
         })
         .select()
         .single();
-      
+
       if (batchError) {
         console.error('Error creating batch:', batchError);
         throw batchError;
@@ -101,33 +110,36 @@ export const addNaqllGumrgRecord = async (recordData, otherData) => {
         })
         .select()
         .single();
-      
+
       if (batchError) {
         console.error('Error creating default batch:', batchError);
         throw batchError;
       }
       batchId = batchData.id;
     }
-    
+
     // Add batch_id to record data
     const finalRecordData = {
       ...recordData,
       batch_id: batchId
     };
-    
+
     const { data, error } = await supabase
       .from('import_and_transportation')
       .insert([finalRecordData])
       .select()
       .single();
-     
+
     if (error) {
       console.error('Error creating import transportation record:', error);
       throw error;
     }
 
     // Handle transactions if there are payments
-    if (finalRecordData.paid_amount_usd > 0 || finalRecordData.paid_amount_iqd > 0) {
+    if (
+      finalRecordData.paid_amount_usd > 0 ||
+      finalRecordData.paid_amount_iqd > 0
+    ) {
       const { error: transactionError } = await supabase
         .from('transactions')
         .insert({
@@ -138,13 +150,13 @@ export const addNaqllGumrgRecord = async (recordData, otherData) => {
           context_id: data.id,
           note: 'Payment for import and transportation'
         });
-      
+
       if (transactionError) {
         console.error('Error creating transaction:', transactionError);
         // Don't throw here, just log the error as the main record was created successfully
       }
     }
-   
+
     return data;
   } catch (error) {
     console.error('Error in addNaqllGumrgRecord:', error);
@@ -153,11 +165,15 @@ export const addNaqllGumrgRecord = async (recordData, otherData) => {
 };
 
 // Fixed function name to match what's used in AddAndUpdateNaqllGumrgDrawer.jsx
-export const updateNaqllGumrgRecord = async (recordId, recordData, otherData) => {
+export const updateNaqllGumrgRecord = async (
+  recordId,
+  recordData,
+  otherData
+) => {
   try {
     // Handle batch updates if needed
     let batchId = recordData.batch_id;
-    
+
     if (otherData && !otherData.old_batch && otherData.batch_name) {
       // Create new batch if switching to new batch
       const { data: batchData, error: batchError } = await supabase
@@ -169,7 +185,7 @@ export const updateNaqllGumrgRecord = async (recordId, recordData, otherData) =>
         })
         .select()
         .single();
-      
+
       if (batchError) {
         console.error('Error creating new batch:', batchError);
         throw batchError;
@@ -178,25 +194,25 @@ export const updateNaqllGumrgRecord = async (recordId, recordData, otherData) =>
     } else if (otherData && otherData.old_batch && otherData.batch_id) {
       batchId = otherData.batch_id;
     }
-    
+
     const finalRecordData = {
       ...recordData,
       batch_id: batchId,
       updated_at: new Date().toISOString()
     };
-    
+
     const { data, error } = await supabase
       .from('import_and_transportation')
       .update(finalRecordData)
       .eq('id', recordId)
       .select()
       .single();
-     
+
     if (error) {
       console.error('Error updating import transportation record:', error);
       throw error;
     }
-   
+
     return data;
   } catch (error) {
     console.error('Error in updateNaqllGumrgRecord:', error);
@@ -209,12 +225,12 @@ export const deleteImportTransportationRecord = async (recordId) => {
   try {
     const { error } = await supabase
       .from('import_and_transportation')
-      .update({ 
+      .update({
         is_deleted: true,
         updated_at: new Date().toISOString()
       })
       .eq('id', recordId);
-     
+
     if (error) {
       console.error('Error deleting import transportation record:', error);
       throw error;
@@ -230,7 +246,8 @@ export const getImportTransportationRecord = async (recordId) => {
   try {
     const { data, error } = await supabase
       .from('import_and_transportation')
-      .select(`
+      .select(
+        `
         *,
         batches (
           id,
@@ -244,16 +261,17 @@ export const getImportTransportationRecord = async (recordId) => {
           phone,
           email
         )
-      `)
+      `
+      )
       .eq('id', recordId)
       .eq('is_deleted', false)
       .single();
-    
+
     if (error) {
       console.error('Error fetching import transportation record:', error);
       throw error;
     }
-    
+
     return data;
   } catch (error) {
     console.error('Error in getImportTransportationRecord:', error);

@@ -707,7 +707,7 @@ const TarqimMrur = () => {
                   />
                 </Col>
 
-                <Col span={6}>
+                <Col span={6} offset={0} style={{ textAlign: 'right' }}>
                   <Button
                     type="default"
                     icon={<ClearOutlined />}
@@ -716,7 +716,7 @@ const TarqimMrur = () => {
                     {t('clear_filters')}
                   </Button>
                 </Col>
-                <Col span={6}>
+                <Col span={6} offset={6} style={{ textAlign: 'left' }}>
                   <Button
                     type="default"
                     icon={<FilePdfOutlined />}

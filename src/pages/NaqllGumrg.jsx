@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   Button,
@@ -8,9 +8,20 @@ import {
   Table,
   Popconfirm,
   Space,
+  Input,
+  Select,
+  DatePicker,
   message
 } from 'antd';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ClearOutlined,
+  FilePdfOutlined
+} from '@ant-design/icons';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { useTranslation } from 'react-i18next';
 import AddAndUpdateNaqllGumrgDrawer from '../components/NaqllGumrg/AddAndUpdateNaqllGumrgDrawer';
 import {
@@ -23,6 +34,15 @@ const NaqllGumrg = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [importTransportationInfo, setImportTransportationInfo] = useState([]);
+
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({
+    customer: null,
+    batch: null,
+    dateRange: null
+  });
+
   const [addAndUpdateModal, setAddAndUpdateModal] = useState({
     open: false,
     record: null
@@ -46,6 +66,230 @@ const NaqllGumrg = () => {
     fetchData();
   }, []);
 
+  // Filter and search logic
+  const filteredData = useMemo(() => {
+    let filtered = importTransportationInfo;
+
+    // Apply search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (item) =>
+          (typeof item.vin_number === 'string' &&
+            item.vin_number.toLowerCase().includes(searchLower)) ||
+          (typeof item.customer?.full_name === 'string' &&  // Fixed: customer instead of customers
+            item.customer.full_name.toLowerCase().includes(searchLower)) ||
+          (typeof item.batch?.name === 'string' &&
+            item.batch.name.toLowerCase().includes(searchLower)) ||
+          (typeof item.car_name === 'string' &&
+            item.car_name.toLowerCase().includes(searchLower)) ||
+          (typeof item.car_model === 'string' &&
+            item.car_model.toString().toLowerCase().includes(searchLower)) ||
+          (typeof item.car_color === 'string' &&
+            item.car_color.toLowerCase().includes(searchLower))
+      );
+    }
+
+    // Apply filters
+    if (filters.customer) {
+      filtered = filtered.filter(
+        (item) => item.customer?.id === filters.customer  // Fixed: customer instead of customers
+      );
+    }
+    if (filters.batch) {
+      filtered = filtered.filter((item) => item.batch?.id === filters.batch);
+    }
+    if (filters.dateRange && filters.dateRange.length === 2) {
+      const [startDate, endDate] = filters.dateRange;
+      filtered = filtered.filter((item) => {
+        const itemDate = new Date(item.created_at);
+        return itemDate >= startDate && itemDate <= endDate;
+      });
+    }
+
+    return filtered;
+  }, [importTransportationInfo, searchTerm, filters]);
+
+  // Get unique values for filter options
+  const uniqueCustomers = useMemo(() => {
+    const customers = importTransportationInfo
+      .map((item) => item.customer)  // Fixed: customer instead of customers
+      .filter((customer) => customer)
+      .reduce((acc, customer) => {
+        if (!acc.find((c) => c.id === customer.id)) {
+          acc.push(customer);
+        }
+        return acc;
+      }, []);
+    return customers;
+  }, [importTransportationInfo]);
+
+  const uniqueBatches = useMemo(() => {
+    const batches = importTransportationInfo
+      .map((item) => item.batch)
+      .filter((batch) => batch)
+      .reduce((acc, batch) => {
+        if (!acc.find((b) => b.id === batch.id)) {
+          acc.push(batch);
+        }
+        return acc;
+      }, []);
+    return batches;
+  }, [importTransportationInfo]);
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilters({
+      customer: null,
+      batch: null,
+      dateRange: null
+    });
+  };
+
+  // Export to PDF function
+  const exportToPDF = () => {
+    const doc = new jsPDF('l', 'mm', 'a3');
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPosition = 20;
+
+    // Title
+    doc.setFontSize(20);
+    doc.setTextColor('#1890ff');
+    doc.text(t('import_transportation_report'), pageWidth / 2, yPosition, {
+      align: 'center'
+    });
+    yPosition += 15;
+
+    // Export date
+    doc.setFontSize(10);
+    doc.setTextColor('#666666');
+    const exportDate = new Date().toLocaleDateString();
+    doc.text(`${t('export_date')}: ${exportDate}`, pageWidth - 20, yPosition, {
+      align: 'right'
+    });
+    yPosition += 10;
+
+    // Check if any filters are applied
+    const hasFilters = searchTerm || filters.customer || filters.batch || filters.dateRange;
+
+    if (hasFilters) {
+      // Applied filters section
+      doc.setFontSize(12);
+      doc.setTextColor('#000');
+      doc.text(t('applied_filters'), 20, yPosition);
+      yPosition += 8;
+
+      doc.setFontSize(10);
+      doc.setTextColor('#666666');
+
+      if (searchTerm) {
+        doc.text(`${t('search')}: ${searchTerm}`, 20, yPosition);
+        yPosition += 5;
+      }
+
+      if (filters.customer) {
+        const customer = uniqueCustomers.find((c) => c.id === filters.customer);
+        doc.text(
+          `${t('customer_name')}: ${customer?.full_name || ''}`,
+          20,
+          yPosition
+        );
+        yPosition += 5;
+      }
+
+      if (filters.batch) {
+        const batch = uniqueBatches.find((b) => b.id === filters.batch);
+        doc.text(`${t('batch_name')}: ${batch?.name || ''}`, 20, yPosition);
+        yPosition += 5;
+      }
+
+      if (filters.dateRange && filters.dateRange.length === 2) {
+        const startDate = filters.dateRange[0].toLocaleDateString();
+        const endDate = filters.dateRange[1].toLocaleDateString();
+        doc.text(
+          `${t('date_range')}: ${startDate} - ${endDate}`,
+          20,
+          yPosition
+        );
+        yPosition += 5;
+      }
+
+      yPosition += 10;
+    }
+
+    // Data to export
+    const dataToExport = hasFilters ? filteredData : importTransportationInfo;
+
+    // Prepare table data
+    const tableData = dataToExport.map((item) => [
+      item.vin_number || '',
+      item.customer?.full_name || t('no_customer'),  // Fixed: customer instead of customers
+      item.batch?.name || t('no_batch'),
+      item.car_name || '',
+      item.car_model || '',
+      item.car_color || '',
+      formatIQD(item.import_fee),
+      formatIQD(item.import_system_fee),
+      formatUSD(item.car_coc_fee),
+      formatUSD(item.transportation_fee),
+      formatUSD(item.total_usd),
+      formatIQD(item.total_iqd),
+      formatUSD(item.paid_amount_usd),
+      formatIQD(item.paid_amount_iqd),
+      new Date(item.created_at).toLocaleDateString()
+    ]);
+
+    // Table headers
+    const headers = [
+      t('vin_number'),
+      t('customer_name'),
+      t('batch_name'),
+      t('car_name'),
+      t('car_model'),
+      t('car_color'),
+      t('import_fee'),
+      t('import_system_fee'),
+      t('car_coc_fee'),
+      t('transportation_fee'),
+      t('total_usd'),
+      t('total_iqd'),
+      t('paid_amount_usd'),
+      t('paid_amount_iqd'),
+      t('created_at')
+    ];
+
+    // Generate table
+    autoTable(doc, {
+      head: [headers],
+      body: tableData,
+      startY: yPosition,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak',
+        halign: 'left'
+      },
+      headStyles: {
+        fillColor: '#1890ff',
+        textColor: '#fff',
+        fontStyle: 'bold',
+        fontSize: 8
+      },
+      alternateRowStyles: {
+        fillColor: '#f5f5f5'
+      },
+      margin: { left: 20, right: 20 }
+    });
+
+    // Generate filename
+    const currentDate = new Date().toISOString().split('T')[0];
+    const filename = `${t('import_transportation_report')}_${currentDate}.pdf`;
+
+    // Save the PDF
+    doc.save(filename);
+  };
+
   const handleDelete = async (id) => {
     setLoading(true);
     try {
@@ -68,10 +312,17 @@ const NaqllGumrg = () => {
     },
     {
       title: t('customer_name'),
-      dataIndex: 'customer',
+      dataIndex: 'customer',  // Fixed: customer instead of customers
       key: 'full_name',
       width: 120,
       render: (customer) => customer?.full_name || t('no_customer')
+    },
+    {
+      title: t('batch_name'),
+      dataIndex: 'batch',
+      key: 'batch',
+      width: 120,
+      render: (batch) => batch?.name || t('no_batch')
     },
     {
       title: t('car_name'),
@@ -248,13 +499,118 @@ const NaqllGumrg = () => {
           </Col>
 
           <Col span={24}>
+            {/* Search and Filter Section */}
+            <Card
+              size="small"
+              style={{
+                marginBottom: 16,
+                borderRadius: 8
+              }}
+            >
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12} md={6} lg={6}>
+                  <Input
+                    placeholder={t('search')}
+                    prefix={<SearchOutlined />}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    allowClear
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={6} lg={6}>
+                  <Select
+                    placeholder={t('customer_name')}
+                    value={filters.customer}
+                    onChange={(value) =>
+                      setFilters((prev) => ({ ...prev, customer: value }))
+                    }
+                    allowClear
+                    showSearch
+                    filterOption={(input, option) =>
+                      option?.children
+                        ?.toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    style={{ width: '100%' }}
+                  >
+                    {uniqueCustomers.slice(0, 10).map((customer) => (
+                      <Select.Option key={customer.id} value={customer.id}>
+                        {customer.full_name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Col>
+                <Col xs={24} sm={12} md={6} lg={6}>
+                  <Select
+                    placeholder={t('batch_name')}
+                    value={filters.batch}
+                    onChange={(value) =>
+                      setFilters((prev) => ({ ...prev, batch: value }))
+                    }
+                    allowClear
+                    showSearch
+                    filterOption={(input, option) =>
+                      option?.children
+                        ?.toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    style={{ width: '100%' }}
+                  >
+                    {uniqueBatches.slice(0, 10).map((batch) => (
+                      <Select.Option key={batch.id} value={batch.id}>
+                        {batch.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Col>
+                <Col xs={24} sm={12} md={6} lg={6}>
+                  <DatePicker.RangePicker
+                    placeholder={[t('start_date'), t('end_date')]}
+                    value={filters.dateRange}
+                    onChange={(dates) =>
+                      setFilters((prev) => ({ ...prev, dateRange: dates }))
+                    }
+                    style={{ width: '100%' }}
+                  />
+                </Col>
+
+                <Col span={6} offset={0} style={{ textAlign: 'right' }}>
+                  <Button
+                    type="default"
+                    icon={<ClearOutlined />}
+                    onClick={clearFilters}
+                  >
+                    {t('clear_filters')}
+                  </Button>
+                </Col>
+                <Col span={6} offset={6} style={{ textAlign: 'left' }}>
+                  <Button
+                    type="default"
+                    icon={<FilePdfOutlined />}
+                    onClick={exportToPDF}
+                  >
+                    {t('export_pdf')}
+                  </Button>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+
+          <Col span={24}>
             <Table
               loading={loading}
               columns={importTransportationColumns}
-              dataSource={importTransportationInfo}
+              dataSource={filteredData}
               rowKey="id"
               scroll={{
                 x: 'max-content'
+              }}
+              pagination={{
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} ${t('of')} ${total} ${t('items')}`,
+                pageSizeOptions: ['10', '20', '50', '100']
               }}
             />
           </Col>
