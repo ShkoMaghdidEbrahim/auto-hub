@@ -579,7 +579,7 @@ const TarqimMrur = () => {
         <Row gutter={[10, 16]}>
           <Col span={24}>
             <Row gutter={[10, 10]}>
-              <Col span={12}>
+              <Col span={18}>
                 <Divider
                   orientation={t('rtl') ? 'right' : 'left'}
                   style={{
