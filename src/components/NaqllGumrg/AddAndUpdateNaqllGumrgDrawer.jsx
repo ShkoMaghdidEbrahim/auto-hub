@@ -24,7 +24,8 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import {
   addNaqllGumrgRecord,
-  updateNaqllGumrgRecord
+  updateNaqllGumrgRecord,
+  getCustomerBatches
 } from '../../database/APIs/NaqllGumrgApi';
 import { getCustomers } from '../../database/APIs/CustomersApi';
 import { getCars } from '../../database/APIs/CarsApi';
@@ -37,6 +38,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const [has_debt, setHasDebt] = useState(record?.has_debt || false);
+  const [oldBatch, setOldBatch] = useState(!!record?.batch);
   const [cars, setCars] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -45,6 +47,11 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
     record?.car_name || null
   );
   const [vehicleSizes, setVehicleSizes] = useState([]);
+  const [customerBatches, setCustomerBatches] = useState([]);
+
+  const total_iqd = form.getFieldValue('total_iqd');
+  const total_usd = form.getFieldValue('total_usd');
+  const customerId = form.getFieldValue('customerId');
 
   useEffect(() => {
     setLoading(true);
@@ -63,21 +70,37 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       });
   }, []);
 
+  // Load customer batches when customer changes
+  useEffect(() => {
+    if (record?.customer_id || customerId) {
+      getCustomerBatches(record?.customer_id || customerId)
+        .then((data) => {
+          setCustomerBatches(data || []);
+        })
+        .catch((error) => {
+          console.error('Error loading customer batches:', error);
+        });
+    }
+  }, [record, customerId]);
+
   // Set form values when record changes
   useEffect(() => {
     if (record && customers.length > 0) {
-      const customerName = record.customers?.full_name;
       form.setFieldsValue({
-        customerId: customerName,
+        customerId: record.customer_id,
         ...record,
-        date: record.date ? dayjs(record.date) : dayjs()
+        date: record.date ? dayjs(record.date) : dayjs(),
+        old_batch: !!record.batch,
+        has_debt: record.has_debt || false
       });
       setHasDebt(record.has_debt || false);
+      setOldBatch(!!record.batch);
       setSelectedCarName(record.car_name || null);
     } else if (!record) {
       form.setFieldsValue({
         date: dayjs(),
-        exchange_rate: 1500
+        exchange_rate: 1500,
+        has_debt: false
       });
     }
   }, [record, customers, form]);
@@ -116,21 +139,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       setSubmitting(true);
       console.log('Form values:', values);
 
-      // Fixed customer ID resolution
-      let customerId = null;
-      if (values.customerId) {
-        const selectedCustomer = customers.find(
-          (c) => c.full_name === values.customerId || c.id === values.customerId
-        );
-        customerId = selectedCustomer ? selectedCustomer.id : null;
-
-        if (!customerId) {
-          console.error('Customer not found for:', values.customerId);
-          message.error(t('customer_not_found'));
-          return;
-        }
-      }
-
       // Helper function to safely convert to number
       const toNumber = (value, defaultValue = 0) => {
         const num = parseFloat(value);
@@ -143,7 +151,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       };
 
       const naqllGumrgData = {
-        customer_id: customerId,
+        customer_id: values.customerId,
         vin_number: values.vin_number || null,
         temporary_plate_number: values.temporary_plate_number || null,
         car_name: values.car_name || null,
@@ -153,21 +161,26 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
         car_color: values.car_color || null,
         import_fee: Math.round(toNumber(values.import_fee)),
         import_system_fee: Math.round(toNumber(values.import_system_fee)),
-        car_coc_fee: Math.round(toNumber(values.car_coc_fee)),
-        transportation_fee: Math.round(toNumber(values.transportation_fee)),
+        car_coc_fee: Math.round(toNumber(values.car_coc_fee) * 100) / 100,
+        transportation_fee: Math.round(toNumber(values.transportation_fee) * 100) / 100,
         window_check_cost: Math.round(toNumber(values.window_check_cost)),
         expenses: Math.round(toNumber(values.expenses)),
         labor_fees: Math.round(toNumber(values.labor_fees)),
-        total_usd: Math.round(toNumber(values.total_usd)),
+        total_usd: Math.round(toNumber(values.total_usd) * 100) / 100,
         total_iqd: Math.round(toNumber(values.total_iqd)),
-        paid_amount_usd: Math.round(toNumber(values.paid_amount_usd)),
+        paid_amount_usd: Math.round(toNumber(values.paid_amount_usd) * 100) / 100,
         paid_amount_iqd: Math.round(toNumber(values.paid_amount_iqd)),
-        has_debt: has_debt || false,
-        debt_amount: has_debt ? Math.round(toNumber(values.debt_amount)) : null,
-        date: values.date
-          ? values.date.format('YYYY-MM-DD')
-          : dayjs().format('YYYY-MM-DD'),
+        usd_to_iqd_rate: Math.round(toNumber(values.exchange_rate)),
         note: values.note || null
+      };
+
+      const otherData = {
+        has_debt: has_debt || false,
+        old_batch: oldBatch,
+        batch_id: values.batch_id || null,
+        batch_name: values.batch_name || null,
+        // Add paid_amount for debt tracking similar to VehicleRegistration
+        paid_amount: values.paid_amount || null
       };
 
       console.log('NaqllGumrg data to submit:', naqllGumrgData);
@@ -191,11 +204,11 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       }
 
       if (record) {
-        await updateNaqllGumrgRecord(record.id, naqllGumrgData);
+        await updateNaqllGumrgRecord(record.id, naqllGumrgData, otherData);
         console.log('NaqllGumrg record updated successfully');
         message.success(t('record_updated_successfully'));
       } else {
-        await addNaqllGumrgRecord(naqllGumrgData);
+        await addNaqllGumrgRecord(naqllGumrgData, otherData);
         console.log('NaqllGumrg record created successfully');
         message.success(t('record_created_successfully'));
       }
@@ -205,13 +218,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
       onClose?.();
     } catch (error) {
       console.error('Error submitting NaqllGumrg record:', error);
-
-      // More specific error handling
-      if (error.message) {
-        message.error(`${t('error_saving_record')}: ${error.message}`);
-      } else {
-        message.error(t('error_saving_record'));
-      }
+      message.error(t('error_saving_record'));
     } finally {
       setSubmitting(false);
     }
@@ -220,34 +227,49 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
   const handleDebtChange = (e) => {
     setHasDebt(e.target.checked);
     if (!e.target.checked) {
-      form.setFieldsValue({ debt_amount: undefined });
+      form.setFieldsValue({ paid_amount: undefined });
+    }
+  };
+
+  const handleBatchChange = (e) => {
+    setOldBatch(e.target.checked);
+    if (!e.target.checked) {
+      form.setFieldsValue({ batch_id: undefined });
     }
   };
 
   const calculateTotal = () => {
     const values = form.getFieldsValue();
-    const moneyFields = [
+    const usdFields = [
+      'car_coc_fee',
+      'transportation_fee'
+    ];
+    const iqdFields = [
       'import_fee',
       'import_system_fee',
-      'car_coc_fee',
-      'transportation_fee',
       'window_check_cost',
       'expenses',
       'labor_fees'
     ];
 
-    const totalUsd = moneyFields.reduce((sum, field) => {
+    const totalUsd = usdFields.reduce((sum, field) => {
+      const value = values[field];
+      return sum + (value ? parseFloat(value) : 0);
+    }, 0);
+
+    const totalIqd = iqdFields.reduce((sum, field) => {
       const value = values[field];
       return sum + (value ? parseFloat(value) : 0);
     }, 0);
 
     // Get exchange rate from form or use default
     const exchangeRate = values.exchange_rate || 1500;
-    const totalIqd = totalUsd * exchangeRate;
+    const totalIqdFromUsd = totalUsd * exchangeRate;
+    const finalTotalIqd = totalIqd + totalIqdFromUsd;
 
     form.setFieldsValue({
       total_usd: Number(totalUsd.toFixed(2)),
-      total_iqd: Math.round(totalIqd)
+      total_iqd: Math.round(finalTotalIqd)
     });
   };
 
@@ -305,7 +327,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                       loading={loading}
                       options={
                         customers?.map((customer) => ({
-                          value: customer.full_name,
+                          value: customer.id,
                           label: customer.full_name,
                           key: customer.id
                         })) || []
@@ -574,7 +596,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                 </Form.Item>
               </Col>
 
-              <Col xs={24} sm={12} md={6}>
+              <Col xs={24} sm={12} md={8}>
                 <Form.Item
                   label={t('transportation_fee')}
                   name="transportation_fee"
@@ -602,7 +624,26 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                   />
                 </Form.Item>
               </Col>
-
+              <Col xs={24} sm={12} md={8}>
+                <Form.Item
+                  label={t('expenses')}
+                  name="expenses"
+                  rules={[
+                    { required: true, message: t('please_enter_expenses') }
+                  ]}
+                >
+                  <InputNumber
+                    style={{ width: '100%' }}
+                    placeholder={t('amount')}
+                    min={0}
+                    step={250}
+                    parser={(value) => value.replace(/\D/g, '')}
+                    formatter={(value) => `${Number(value).toLocaleString()}`}
+                    addonBefore={'IQD'}
+                    onChange={onMoneyFieldChange}
+                  />
+                </Form.Item>
+              </Col>
               <Col xs={24} sm={12} md={8}>
                 <Form.Item label={t('exchange_rate')} name="exchange_rate">
                   <InputNumber
@@ -619,6 +660,57 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                 </Form.Item>
               </Col>
             </Row>
+            
+            {/* Debt Checkbox in Pricing Section */}
+            {!record ? (
+              <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
+                <Col xs={24}>
+                  <Form.Item name="has_debt" valuePropName="checked">
+                    <Checkbox onChange={handleDebtChange}>
+                      {t('has_outstanding_debt')}
+                    </Checkbox>
+                  </Form.Item>
+                </Col>
+
+                {has_debt && (
+                  <Col xs={24} sm={12} md={8}>
+                    <Form.Item
+                      label={t('paid_amount')}
+                      name="paid_amount"
+                      rules={[
+                        {
+                          required: has_debt,
+                          message: t('please_enter_paid_amount')
+                        },
+                        {
+                          validator: (_, value) => {
+                            if (value > total_iqd) {
+                              return Promise.reject(
+                                new Error(t('paid_amount_cannot_exceed_total'))
+                              );
+                            }
+                            return Promise.resolve();
+                          }
+                        }
+                      ]}
+                    >
+                      <InputNumber
+                        style={{ width: '100%' }}
+                        placeholder={t('amount')}
+                        min={0}
+                        step={250}
+                        max={total_iqd}
+                        parser={(value) => value.replace(/\D/g, '')}
+                        formatter={(value) =>
+                          `${Number(value).toLocaleString()}`
+                        }
+                        addonBefore={'IQD'}
+                      />
+                    </Form.Item>
+                  </Col>
+                )}
+              </Row>
+            ) : null}
           </Card>
 
           {/* Totals and Payments Section */}
@@ -670,7 +762,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                     precision={2}
                     prefix="$"
                     readOnly
-                    value={0}
                   />
                 </Form.Item>
               </Col>
@@ -689,48 +780,13 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                     }
                     parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                     readOnly
-                    value={0}
                   />
                 </Form.Item>
               </Col>
             </Row>
-
-            {/* Debt Checkbox in Pricing Section */}
-            <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
-              <Col xs={24}>
-                <Form.Item name="has_debt" valuePropName="checked">
-                  <Checkbox onChange={handleDebtChange} checked={has_debt}>
-                    {t('has_outstanding_debt')}
-                  </Checkbox>
-                </Form.Item>
-              </Col>
-
-              {has_debt && (
-                <Col xs={24} sm={12} md={8}>
-                  <Form.Item
-                    label={t('debt_amount')}
-                    name="debt_amount"
-                    rules={[
-                      {
-                        required: has_debt,
-                        message: t('please_enter_debt_amount')
-                      }
-                    ]}
-                  >
-                    <InputNumber
-                      placeholder={t('enter_debt_amount')}
-                      style={{ width: '100%' }}
-                      min={0}
-                      precision={2}
-                      prefix="$"
-                    />
-                  </Form.Item>
-                </Col>
-              )}
-            </Row>
           </Card>
 
-          {/* Additional Information Section - removed date field since it's not in table */}
+          {/* Additional Information Section */}
           <Card
             title={
               <span>
@@ -742,6 +798,79 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
             size="small"
           >
             <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12} md={8}>
+                <Form.Item
+                  label={t('date')}
+                  name="date"
+                  rules={[{ required: true, message: t('please_select_date') }]}
+                >
+                  <DatePicker
+                    style={{ width: '100%' }}
+                    placeholder={t('date')}
+                  />
+                </Form.Item>
+              </Col>
+
+              <Col span={24}>
+                <Row gutter={[16, 16]} style={{ marginTop: '16px' }}>
+                  <Col xs={24}>
+                    <Form.Item name="old_batch" valuePropName="checked">
+                      <Checkbox onChange={handleBatchChange}>
+                        {t('belongs_to_old_batch')}
+                      </Checkbox>
+                    </Form.Item>
+                  </Col>
+
+                  {oldBatch ? (
+                    <Col xs={24} sm={12} md={8}>
+                      <Form.Item
+                        label={t('batch')}
+                        name="batch_id"
+                        rules={[
+                          {
+                            required: oldBatch,
+                            message: t('please_select_batch')
+                          }
+                        ]}
+                      >
+                        <Select
+                          placeholder={t('select_batch')}
+                          showSearch
+                          allowClear
+                          loading={loading}
+                          options={customerBatches?.map((batch) => ({
+                            value: batch.id,
+                            label: batch.note || `Batch #${batch.id}`
+                          }))}
+                          filterOption={(input, option) =>
+                            (option?.label ?? '')
+                              .toString()
+                              .toLowerCase()
+                              .includes(input.toLowerCase())
+                          }
+                          style={{ width: '100%' }}
+                        />
+                      </Form.Item>
+                    </Col>
+                  ) : (
+                    <Col xs={24} sm={12} md={8}>
+                      <Form.Item
+                        label={t('batch_name')}
+                        name="batch_name"
+                        rules={[
+                          {
+                            required: !oldBatch,
+                            message: t('please_write_batch_name')
+                          }
+                        ]}
+                      >
+                        <Input placeholder={t('batch_name')} />
+                      </Form.Item>
+                    </Col>
+                  )}
+                </Row>
+              </Col>
+
               <Col xs={24}>
                 <Form.Item label={t('note')} name="note">
                   <TextArea
