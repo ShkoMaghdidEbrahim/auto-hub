@@ -29,6 +29,7 @@ import {
   deleteRegistration
 } from '../database/APIs/RegistrationApi';
 import { formatIQD } from '../helpers/formatMoney';
+import { supabase } from '../database/supabase';
 
 const TarqimMrur = () => {
   const { t } = useTranslation();
@@ -43,6 +44,8 @@ const TarqimMrur = () => {
     vehicleSize: null,
     dateRange: null
   });
+  const [customerSearchResults, setCustomerSearchResults] = useState([]);
+  const [customerSearchLoading, setCustomerSearchLoading] = useState(false);
 
   useEffect(() => {
     getRegistrations()
@@ -164,6 +167,37 @@ const TarqimMrur = () => {
     return sizes;
   }, [registrationInfo]);
 
+  // Search customers function
+  const searchCustomers = async (searchValue) => {
+    if (!searchValue || searchValue.length < 2) {
+      setCustomerSearchResults([]);
+      return;
+    }
+
+    setCustomerSearchLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('id, full_name, phone, email')
+        .or(
+          `full_name.ilike.%${searchValue}%,phone.ilike.%${searchValue}%,email.ilike.%${searchValue}%`
+        )
+        .eq('is_deleted', false)
+        .limit(20);
+
+      if (error) {
+        console.error('Error searching customers:', error);
+        return;
+      }
+
+      setCustomerSearchResults(data || []);
+    } catch (error) {
+      console.error('Error searching customers:', error);
+    } finally {
+      setCustomerSearchLoading(false);
+    }
+  };
+
   // Clear all filters
   const clearFilters = () => {
     setSearchTerm('');
@@ -173,6 +207,7 @@ const TarqimMrur = () => {
       vehicleSize: null,
       dateRange: null
     });
+    setCustomerSearchResults([]);
   };
 
   // Export to PDF function
@@ -625,7 +660,7 @@ const TarqimMrur = () => {
               }}
             >
               <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={8} lg={6}>
+                <Col xs={24} sm={12} md={6} lg={4}>
                   <Input
                     placeholder={t('search')}
                     prefix={<SearchOutlined />}
@@ -634,7 +669,7 @@ const TarqimMrur = () => {
                     allowClear
                   />
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
+                <Col xs={24} sm={12} md={6} lg={4}>
                   <Select
                     placeholder={t('customer_name')}
                     value={filters.customer}
@@ -647,24 +682,39 @@ const TarqimMrur = () => {
                     }
                     allowClear
                     showSearch
-                    filterOption={(input, option) =>
-                      option?.children
-                        ?.toLowerCase()
-                        .includes(input.toLowerCase())
+                    loading={customerSearchLoading}
+                    onSearch={searchCustomers}
+                    filterOption={false}
+                    notFoundContent={
+                      customerSearchLoading ? 'جاري البحث...' : 'لا توجد نتائج'
                     }
                     style={{ width: '100%' }}
                     dropdownMatchSelectWidth={false}
                     maxTagCount={1}
                     listHeight={400}
+                    optionLabelProp="label"
                   >
-                    {uniqueCustomers.slice(0, 10).map((customer) => (
-                      <Select.Option key={customer.id} value={customer.id}>
-                        {customer.full_name}
+                    {(customerSearchResults.length > 0
+                      ? customerSearchResults
+                      : uniqueCustomers.slice(0, 10)
+                    ).map((customer) => (
+                      <Select.Option
+                        key={customer.id}
+                        value={customer.id}
+                        label={customer.full_name}
+                      >
+                        <div>
+                          <div>{customer.full_name}</div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            {customer.phone}{' '}
+                            {customer.email && `• ${customer.email}`}
+                          </div>
+                        </div>
                       </Select.Option>
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
+                <Col xs={24} sm={12} md={6} lg={4}>
                   <Select
                     placeholder={
                       filters.customer
@@ -695,7 +745,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
+                <Col xs={24} sm={12} md={6} lg={4}>
                   <Select
                     placeholder={t('vehicle_size')}
                     value={filters.vehicleSize}
@@ -712,7 +762,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
+                <Col xs={24} sm={12} md={6} lg={4}>
                   <DatePicker.RangePicker
                     placeholder={[t('start_date'), t('end_date')]}
                     value={filters.dateRange}
@@ -722,24 +772,29 @@ const TarqimMrur = () => {
                     style={{ width: '100%' }}
                   />
                 </Col>
-
-                <Col span={6} offset={0} style={{ textAlign: 'right' }}>
-                  <Button
-                    type="default"
-                    icon={<ClearOutlined />}
-                    onClick={clearFilters}
-                  >
-                    {t('clear_filters')}
-                  </Button>
-                </Col>
-                <Col span={6} offset={6} style={{ textAlign: 'left' }}>
-                  <Button
-                    type="default"
-                    icon={<FilePdfOutlined />}
-                    onClick={exportToPDF}
-                  >
-                    {t('export_pdf')}
-                  </Button>
+                <Col xs={24} sm={12} md={6} lg={4}>
+                  <Row justify="end" gutter={[8, 8]}>
+                    <Col>
+                      <Button
+                        type="default"
+                        icon={<ClearOutlined />}
+                        onClick={clearFilters}
+                        size="middle"
+                      >
+                        {t('clear_filters')}
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button
+                        type="primary"
+                        icon={<FilePdfOutlined />}
+                        onClick={exportToPDF}
+                        size="middle"
+                      >
+                        {t('export_pdf')}
+                      </Button>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Card>
