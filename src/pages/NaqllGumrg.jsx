@@ -77,7 +77,7 @@ const NaqllGumrg = () => {
         (item) =>
           (typeof item.vin_number === 'string' &&
             item.vin_number.toLowerCase().includes(searchLower)) ||
-          (typeof item.customer?.full_name === 'string' &&  // Fixed: customer instead of customers
+          (typeof item.customer?.full_name === 'string' && // Fixed: customer instead of customers
             item.customer.full_name.toLowerCase().includes(searchLower)) ||
           (typeof item.batch?.name === 'string' &&
             item.batch.name.toLowerCase().includes(searchLower)) ||
@@ -93,7 +93,7 @@ const NaqllGumrg = () => {
     // Apply filters
     if (filters.customer) {
       filtered = filtered.filter(
-        (item) => item.customer?.id === filters.customer  // Fixed: customer instead of customers
+        (item) => item.customer?.id === filters.customer // Fixed: customer instead of customers
       );
     }
     if (filters.batch) {
@@ -113,7 +113,7 @@ const NaqllGumrg = () => {
   // Get unique values for filter options
   const uniqueCustomers = useMemo(() => {
     const customers = importTransportationInfo
-      .map((item) => item.customer)  // Fixed: customer instead of customers
+      .map((item) => item.customer) // Fixed: customer instead of customers
       .filter((customer) => customer)
       .reduce((acc, customer) => {
         if (!acc.find((c) => c.id === customer.id)) {
@@ -125,7 +125,13 @@ const NaqllGumrg = () => {
   }, [importTransportationInfo]);
 
   const uniqueBatches = useMemo(() => {
+    // If no customer is selected, return empty array
+    if (!filters.customer) {
+      return [];
+    }
+
     const batches = importTransportationInfo
+      .filter((item) => item.customer?.id === filters.customer) // Filter by selected customer
       .map((item) => item.batch)
       .filter((batch) => batch)
       .reduce((acc, batch) => {
@@ -135,7 +141,7 @@ const NaqllGumrg = () => {
         return acc;
       }, []);
     return batches;
-  }, [importTransportationInfo]);
+  }, [importTransportationInfo, filters.customer]);
 
   // Clear all filters
   const clearFilters = () => {
@@ -171,7 +177,8 @@ const NaqllGumrg = () => {
     yPosition += 10;
 
     // Check if any filters are applied
-    const hasFilters = searchTerm || filters.customer || filters.batch || filters.dateRange;
+    const hasFilters =
+      searchTerm || filters.customer || filters.batch || filters.dateRange;
 
     if (hasFilters) {
       // Applied filters section
@@ -205,8 +212,8 @@ const NaqllGumrg = () => {
       }
 
       if (filters.dateRange && filters.dateRange.length === 2) {
-        const startDate = filters.dateRange[0].toLocaleDateString();
-        const endDate = filters.dateRange[1].toLocaleDateString();
+        const startDate = dayjs(filters.dateRange[0]).format('DD/MM/YYYY');
+        const endDate = dayjs(filters.dateRange[1]).format('DD/MM/YYYY');
         doc.text(
           `${t('date_range')}: ${startDate} - ${endDate}`,
           20,
@@ -224,7 +231,7 @@ const NaqllGumrg = () => {
     // Prepare table data
     const tableData = dataToExport.map((item) => [
       item.vin_number || '',
-      item.customer?.full_name || t('no_customer'),  // Fixed: customer instead of customers
+      item.customer?.full_name || t('no_customer'), // Fixed: customer instead of customers
       item.batch?.name || t('no_batch'),
       item.car_name || '',
       item.car_model || '',
@@ -312,7 +319,7 @@ const NaqllGumrg = () => {
     },
     {
       title: t('customer_name'),
-      dataIndex: 'customer',  // Fixed: customer instead of customers
+      dataIndex: 'customer', // Fixed: customer instead of customers
       key: 'full_name',
       width: 120,
       render: (customer) => customer?.full_name || t('no_customer')
@@ -522,7 +529,11 @@ const NaqllGumrg = () => {
                     placeholder={t('customer_name')}
                     value={filters.customer}
                     onChange={(value) =>
-                      setFilters((prev) => ({ ...prev, customer: value }))
+                      setFilters((prev) => ({
+                        ...prev,
+                        customer: value,
+                        batch: null // Clear batch filter when customer changes
+                      }))
                     }
                     allowClear
                     showSearch
@@ -542,13 +553,18 @@ const NaqllGumrg = () => {
                 </Col>
                 <Col xs={24} sm={12} md={6} lg={6}>
                   <Select
-                    placeholder={t('batch_name')}
+                    placeholder={
+                      filters.customer
+                        ? t('batch_name')
+                        : `${t('batch_name')} (${t('customer_name')})`
+                    }
                     value={filters.batch}
                     onChange={(value) =>
                       setFilters((prev) => ({ ...prev, batch: value }))
                     }
                     allowClear
                     showSearch
+                    disabled={!filters.customer}
                     filterOption={(input, option) =>
                       option?.children
                         ?.toLowerCase()
