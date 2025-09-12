@@ -588,30 +588,22 @@ const TarqimMrur = () => {
                   }}
                   dashed={true}
                 >
-                  {t('cars')}
+                  {t('tarqim_mrur')}
                 </Divider>
               </Col>
-              <Col span={12}>
-                <Space>
-                  <Button
-                    type="default"
-                    icon={<FilePdfOutlined />}
-                    onClick={exportToPDF}
-                  >
-                    {t('export_pdf')}
-                  </Button>
-                  <Button
-                    type="primary"
-                    onClick={() =>
-                      setAddAndUpdateVehicleRegistrationModal({
-                        open: true,
-                        registration: null
-                      })
-                    }
-                  >
-                    {t('add_registration')}
-                  </Button>
-                </Space>
+              <Col span={6}>
+                <Button
+                  block
+                  type="primary"
+                  onClick={() =>
+                    setAddAndUpdateVehicleRegistrationModal({
+                      open: true,
+                      record: null
+                    })
+                  }
+                >
+                  {t('add_registration')}
+                </Button>
               </Col>
             </Row>
           </Col>
@@ -714,13 +706,23 @@ const TarqimMrur = () => {
                     style={{ width: '100%' }}
                   />
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
+
+                <Col span={6}>
                   <Button
+                    type="default"
                     icon={<ClearOutlined />}
                     onClick={clearFilters}
-                    style={{ width: '100%' }}
                   >
                     {t('clear_filters')}
+                  </Button>
+                </Col>
+                <Col span={6}>
+                  <Button
+                    type="default"
+                    icon={<FilePdfOutlined />}
+                    onClick={exportToPDF}
+                  >
+                    {t('export_pdf')}
                   </Button>
                 </Col>
               </Row>
