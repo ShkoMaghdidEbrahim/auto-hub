@@ -82,37 +82,40 @@ export const addNaqllGumrgRecord = async (recordData, otherData) => {
     if (otherData && otherData.old_batch && otherData.batch_id) {
       // Use existing batch
       batchId = otherData.batch_id;
-    } else if (otherData && !otherData.old_batch && otherData.batch_name) {
+    } else if (otherData && !otherData.old_batch) {
+      // Generate batch name if not provided
+      let batchName = otherData.batch_name;
+
+      if (!batchName || batchName.trim() === '') {
+        // Get existing batches for this customer to count them
+        const { data: existingBatches, error: countError } = await supabase
+          .from('batches')
+          .select('id')
+          .eq('customer_id', recordData.customer_id)
+          .eq('batch_type', 'import_and_transportation');
+
+        if (countError) {
+          console.error('Error counting existing batches:', countError);
+          throw countError;
+        }
+
+        const batchNumber = (existingBatches?.length || 0) + 1;
+        batchName = `Batch ${batchNumber}`;
+      }
+
       // Create new batch
       const { data: batchData, error: batchError } = await supabase
         .from('batches')
         .insert({
           customer_id: recordData.customer_id,
           batch_type: 'import_and_transportation',
-          name: otherData.batch_name
+          name: batchName
         })
         .select()
         .single();
 
       if (batchError) {
         console.error('Error creating batch:', batchError);
-        throw batchError;
-      }
-      batchId = batchData.id;
-    } else {
-      // Create default batch if none specified
-      const { data: batchData, error: batchError } = await supabase
-        .from('batches')
-        .insert({
-          customer_id: recordData.customer_id,
-          batch_type: 'import_and_transportation',
-          name: `Import Batch ${new Date().toISOString().split('T')[0]}`
-        })
-        .select()
-        .single();
-
-      if (batchError) {
-        console.error('Error creating default batch:', batchError);
         throw batchError;
       }
       batchId = batchData.id;
