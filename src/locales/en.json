@@ -672,6 +672,7 @@
   "items": "items",
   "export_pdf": "Export PDF",
   "vehicle_registration_report": "Vehicle Registration Report",
+  "import_transportation_report": "Import Transportation Report",
   "export_date": "Export Date",
   "applied_filters": "Applied Filters",
   "date_range": "Date Range"

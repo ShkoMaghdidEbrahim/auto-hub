@@ -10,7 +10,8 @@ import {
   Space,
   Input,
   Select,
-  DatePicker
+  DatePicker,
+  message
 } from 'antd';
 import dayjs from 'dayjs';
 import {
@@ -23,6 +24,10 @@ import {
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useTranslation } from 'react-i18next';
+import pdfFontManager, {
+  getCurrentLanguage,
+  isRTLLanguage
+} from '../helpers/pdfFonts';
 import AddAndUpdateVehicleRegistrationDrawer from '../components/TarqimMrur/AddAndUpdateVehicleRegistrationDrawer';
 import {
   getRegistrations,
@@ -211,8 +216,17 @@ const TarqimMrur = () => {
   };
 
   // Export to PDF function
-  const exportToPDF = () => {
-    const doc = new jsPDF('l', 'mm', 'a3'); // A3 landscape for wider table display
+  const exportToPDF = async () => {
+    const currentLanguage = getCurrentLanguage();
+    const isRTL = isRTLLanguage(currentLanguage);
+
+    // Create document with font support
+    const { doc, font, boldFont } = await pdfFontManager.createDocument(
+      'l',
+      'mm',
+      'a3',
+      currentLanguage
+    );
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -227,25 +241,31 @@ const TarqimMrur = () => {
     try {
       const logoImg = new Image();
       logoImg.src = '/logo.png';
-      doc.addImage(logoImg, 'PNG', 20, 10, 30, 20);
+      const logoX = isRTL ? pageWidth - 50 : 20;
+      doc.addImage(logoImg, 'PNG', logoX, 10, 30, 20);
     } catch (error) {
       console.log('Logo not found, continuing without logo');
     }
 
     // Title
+    doc.setFont(boldFont, 'bold');
     doc.setFontSize(20);
     doc.setTextColor(primaryColor);
+
     doc.text(t('vehicle_registration_report'), pageWidth / 2, yPosition, {
       align: 'center'
     });
     yPosition += 15;
 
     // Export date
+    doc.setFont(font);
     doc.setFontSize(10);
     doc.setTextColor(darkGray);
     const exportDate = new Date().toLocaleDateString();
-    doc.text(`${t('export_date')}: ${exportDate}`, pageWidth - 20, yPosition, {
-      align: 'right'
+    const dateAlign = isRTL ? 'left' : 'right';
+    const dateX = isRTL ? 20 : pageWidth - 20;
+    doc.text(`${t('export_date')}: ${exportDate}`, dateX, yPosition, {
+      align: dateAlign
     });
     yPosition += 10;
 
@@ -259,16 +279,23 @@ const TarqimMrur = () => {
 
     if (hasFilters) {
       // Applied filters section
+      doc.setFont(boldFont);
       doc.setFontSize(12);
       doc.setTextColor('#000');
-      doc.text(t('applied_filters'), 20, yPosition);
+      const filterX = isRTL ? pageWidth - 20 : 20;
+      doc.text(t('applied_filters'), filterX, yPosition, {
+        align: isRTL ? 'right' : 'left'
+      });
       yPosition += 8;
 
+      doc.setFont(font);
       doc.setFontSize(10);
       doc.setTextColor(darkGray);
 
       if (searchTerm) {
-        doc.text(`${t('search')}: ${searchTerm}`, 20, yPosition);
+        doc.text(`${t('search')}: ${searchTerm}`, filterX, yPosition, {
+          align: isRTL ? 'right' : 'left'
+        });
         yPosition += 5;
       }
 
@@ -276,15 +303,25 @@ const TarqimMrur = () => {
         const customer = uniqueCustomers.find((c) => c.id === filters.customer);
         doc.text(
           `${t('customer_name')}: ${customer?.full_name || ''}`,
-          20,
-          yPosition
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
         );
         yPosition += 5;
       }
 
       if (filters.batch) {
         const batch = uniqueBatches.find((b) => b.id === filters.batch);
-        doc.text(`${t('batch_name')}: ${batch?.name || ''}`, 20, yPosition);
+        doc.text(
+          `${t('batch_name')}: ${batch?.name || ''}`,
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
+        );
         yPosition += 5;
       }
 
@@ -292,7 +329,14 @@ const TarqimMrur = () => {
         const size = uniqueVehicleSizes.find(
           (s) => s.id === filters.vehicleSize
         );
-        doc.text(`${t('vehicle_size')}: ${size?.name || ''}`, 20, yPosition);
+        doc.text(
+          `${t('vehicle_size')}: ${size?.name || ''}`,
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
+        );
         yPosition += 5;
       }
 
@@ -301,8 +345,11 @@ const TarqimMrur = () => {
         const endDate = dayjs(filters.dateRange[1]).format('DD/MM/YYYY');
         doc.text(
           `${t('date_range')}: ${startDate} - ${endDate}`,
-          20,
-          yPosition
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
         );
         yPosition += 5;
       }
@@ -371,41 +418,45 @@ const TarqimMrur = () => {
         fontSize: 8,
         cellPadding: 2,
         overflow: 'linebreak',
-        halign: 'left',
-        valign: 'middle'
+        halign: isRTL ? 'right' : 'left',
+        valign: 'middle',
+        font: font
       },
       headStyles: {
         fillColor: primaryColor,
         textColor: '#fff',
         fontStyle: 'bold',
-        fontSize: 8
+        fontSize: 8,
+        font: boldFont,
+        halign: isRTL ? 'right' : 'left'
       },
       alternateRowStyles: {
-        fillColor: lightGray
+        fillColor: lightGray,
+        font: font
       },
       margin: { left: 20, right: 20 },
       tableWidth: 'auto',
       showHead: 'everyPage',
       columnStyles: {
-        0: { cellWidth: 25 }, // VIN
-        1: { cellWidth: 30 }, // Customer
-        2: { cellWidth: 25 }, // Batch
-        3: { cellWidth: 25 }, // Car name
-        4: { cellWidth: 20 }, // Model
-        5: { cellWidth: 25 }, // Size
-        6: { cellWidth: 20 }, // Cylinders
-        7: { cellWidth: 20 }, // Color
-        8: { cellWidth: 25 }, // Plate
-        9: { cellWidth: 20 }, // Size fee
-        10: { cellWidth: 20 }, // Plate cost
-        11: { cellWidth: 20 }, // Legal cost
-        12: { cellWidth: 20 }, // Inspection cost
-        13: { cellWidth: 20 }, // Electronic cost
-        14: { cellWidth: 20 }, // Window cost
-        15: { cellWidth: 20 }, // Expenses
-        16: { cellWidth: 20 }, // Labor fees
-        17: { cellWidth: 20 }, // Total
-        18: { cellWidth: 25 } // Created at
+        0: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // VIN
+        1: { cellWidth: 30, font: font, halign: isRTL ? 'right' : 'left' }, // Customer
+        2: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // Batch
+        3: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // Car name
+        4: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Model
+        5: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // Size
+        6: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Cylinders
+        7: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Color
+        8: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // Plate
+        9: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Size fee
+        10: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Plate cost
+        11: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Legal cost
+        12: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Inspection cost
+        13: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Electronic cost
+        14: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Window cost
+        15: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Expenses
+        16: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Labor fees
+        17: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Total
+        18: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' } // Created at
       }
     });
 

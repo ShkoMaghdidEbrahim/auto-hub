@@ -23,6 +23,10 @@ import {
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useTranslation } from 'react-i18next';
+import pdfFontManager, {
+  getCurrentLanguage,
+  isRTLLanguage
+} from '../helpers/pdfFonts';
 import AddAndUpdateNaqllGumrgDrawer from '../components/NaqllGumrg/AddAndUpdateNaqllGumrgDrawer';
 import {
   getImportTransportationRecords,
@@ -189,25 +193,39 @@ const NaqllGumrg = () => {
   };
 
   // Export to PDF function
-  const exportToPDF = () => {
-    const doc = new jsPDF('l', 'mm', 'a3');
+  const exportToPDF = async () => {
+    const currentLanguage = getCurrentLanguage();
+    const isRTL = isRTLLanguage(currentLanguage);
+
+    // Create document with font support
+    const { doc, font, boldFont } = await pdfFontManager.createDocument(
+      'l',
+      'mm',
+      'a3',
+      currentLanguage
+    );
     const pageWidth = doc.internal.pageSize.getWidth();
     let yPosition = 20;
 
     // Title
+    doc.setFont(boldFont, 'bold');
     doc.setFontSize(20);
     doc.setTextColor('#1890ff');
+
     doc.text(t('import_transportation_report'), pageWidth / 2, yPosition, {
       align: 'center'
     });
     yPosition += 15;
 
     // Export date
+    doc.setFont(font);
     doc.setFontSize(10);
     doc.setTextColor('#666666');
     const exportDate = new Date().toLocaleDateString();
-    doc.text(`${t('export_date')}: ${exportDate}`, pageWidth - 20, yPosition, {
-      align: 'right'
+    const dateAlign = isRTL ? 'left' : 'right';
+    const dateX = isRTL ? 20 : pageWidth - 20;
+    doc.text(`${t('export_date')}: ${exportDate}`, dateX, yPosition, {
+      align: dateAlign
     });
     yPosition += 10;
 
@@ -217,16 +235,23 @@ const NaqllGumrg = () => {
 
     if (hasFilters) {
       // Applied filters section
+      doc.setFont(boldFont);
       doc.setFontSize(12);
       doc.setTextColor('#000');
-      doc.text(t('applied_filters'), 20, yPosition);
+      const filterX = isRTL ? pageWidth - 20 : 20;
+      doc.text(t('applied_filters'), filterX, yPosition, {
+        align: isRTL ? 'right' : 'left'
+      });
       yPosition += 8;
 
+      doc.setFont(font);
       doc.setFontSize(10);
       doc.setTextColor('#666666');
 
       if (searchTerm) {
-        doc.text(`${t('search')}: ${searchTerm}`, 20, yPosition);
+        doc.text(`${t('search')}: ${searchTerm}`, filterX, yPosition, {
+          align: isRTL ? 'right' : 'left'
+        });
         yPosition += 5;
       }
 
@@ -234,15 +259,25 @@ const NaqllGumrg = () => {
         const customer = uniqueCustomers.find((c) => c.id === filters.customer);
         doc.text(
           `${t('customer_name')}: ${customer?.full_name || ''}`,
-          20,
-          yPosition
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
         );
         yPosition += 5;
       }
 
       if (filters.batch) {
         const batch = uniqueBatches.find((b) => b.id === filters.batch);
-        doc.text(`${t('batch_name')}: ${batch?.name || ''}`, 20, yPosition);
+        doc.text(
+          `${t('batch_name')}: ${batch?.name || ''}`,
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
+        );
         yPosition += 5;
       }
 
@@ -251,8 +286,11 @@ const NaqllGumrg = () => {
         const endDate = dayjs(filters.dateRange[1]).format('DD/MM/YYYY');
         doc.text(
           `${t('date_range')}: ${startDate} - ${endDate}`,
-          20,
-          yPosition
+          filterX,
+          yPosition,
+          {
+            align: isRTL ? 'right' : 'left'
+          }
         );
         yPosition += 5;
       }
@@ -310,16 +348,20 @@ const NaqllGumrg = () => {
         fontSize: 8,
         cellPadding: 2,
         overflow: 'linebreak',
-        halign: 'left'
+        halign: isRTL ? 'right' : 'left',
+        font: font
       },
       headStyles: {
         fillColor: '#1890ff',
         textColor: '#fff',
         fontStyle: 'bold',
-        fontSize: 8
+        fontSize: 8,
+        font: boldFont,
+        halign: isRTL ? 'right' : 'left'
       },
       alternateRowStyles: {
-        fillColor: '#f5f5f5'
+        fillColor: '#f5f5f5',
+        font: font
       },
       margin: { left: 20, right: 20 }
     });
