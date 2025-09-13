@@ -38,17 +38,9 @@ const CustomerActivities = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <Row gutter={[10, 10]}>
+          <Row gutter={[16, 16]}>
             {Customers.map((customer) => (
-              <Col
-                key={customer.id}
-                xs={24}
-                sm={12}
-                md={12}
-                lg={12}
-                xl={8}
-                style={{ padding: '10px' }}
-              >
+              <Col key={customer.id} xs={24} sm={12} md={12} lg={12} xl={8}>
                 <Card
                   onClick={() =>
                     setCustomerProfileDrawer({
@@ -58,6 +50,7 @@ const CustomerActivities = () => {
                   }
                   style={{
                     cursor: 'pointer',
+                    height: '100%',
                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                   }}
                   title={customer.full_name}
