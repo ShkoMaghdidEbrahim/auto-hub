@@ -669,38 +669,7 @@ const TarqimMrur = () => {
         variant={'borderless'}
         key={'dashboard'}
       >
-        <Row gutter={[10, 16]}>
-          <Col span={24}>
-            <Row gutter={[10, 10]}>
-              <Col span={18}>
-                <Divider
-                  orientation={t('rtl') ? 'right' : 'left'}
-                  style={{
-                    fontSize: 24,
-                    margin: 0
-                  }}
-                  dashed={true}
-                >
-                  {t('tarqim_mrur')}
-                </Divider>
-              </Col>
-              <Col span={6}>
-                <Button
-                  block
-                  type="primary"
-                  onClick={() =>
-                    setAddAndUpdateVehicleRegistrationModal({
-                      open: true,
-                      record: null
-                    })
-                  }
-                >
-                  {t('add_registration')}
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-
+        <Row gutter={[10, 10]}>
           <Col span={24}>
             {/* Search and Filter Section */}
             <Card
@@ -710,8 +679,8 @@ const TarqimMrur = () => {
                 borderRadius: 8
               }}
             >
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={6} lg={4}>
+              <Row gutter={[10, 10]}>
+                <Col xs={24} md={5}>
                   <Input
                     placeholder={t('search')}
                     prefix={<SearchOutlined />}
@@ -720,7 +689,7 @@ const TarqimMrur = () => {
                     allowClear
                   />
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={4}>
+                <Col xs={24} md={5}>
                   <Select
                     placeholder={t('customer_name')}
                     value={filters.customer}
@@ -765,7 +734,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={4}>
+                <Col xs={24} md={5}>
                   <Select
                     placeholder={
                       filters.customer
@@ -785,7 +754,6 @@ const TarqimMrur = () => {
                         .includes(input.toLowerCase())
                     }
                     style={{ width: '100%' }}
-                    dropdownMatchSelectWidth={false}
                     maxTagCount={1}
                     listHeight={400}
                   >
@@ -796,7 +764,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={4}>
+                <Col xs={24} md={5}>
                   <Select
                     placeholder={t('vehicle_size')}
                     value={filters.vehicleSize}
@@ -813,7 +781,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={4}>
+                <Col xs={24} md={4}>
                   <DatePicker.RangePicker
                     placeholder={[t('start_date'), t('end_date')]}
                     value={filters.dateRange}
@@ -823,29 +791,42 @@ const TarqimMrur = () => {
                     style={{ width: '100%' }}
                   />
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={4}>
-                  <Row justify="end" gutter={[8, 8]}>
-                    <Col>
-                      <Button
-                        type="default"
-                        icon={<ClearOutlined />}
-                        onClick={clearFilters}
-                        size="middle"
-                      >
-                        {t('clear_filters')}
-                      </Button>
-                    </Col>
-                    <Col>
-                      <Button
-                        type="primary"
-                        icon={<FilePdfOutlined />}
-                        onClick={exportToPDF}
-                        size="middle"
-                      >
-                        {t('export_pdf')}
-                      </Button>
-                    </Col>
-                  </Row>
+                <Col xs={24} md={8}>
+                  <Button
+                    block
+                    type="default"
+                    icon={<ClearOutlined />}
+                    onClick={clearFilters}
+                    size="middle"
+                  >
+                    {t('clear_filters')}
+                  </Button>
+                </Col>
+                <Col xs={24} md={8}>
+                  <Button
+                    block
+                    type="primary"
+                    icon={<FilePdfOutlined />}
+                    onClick={exportToPDF}
+                    size="middle"
+                  >
+                    {t('export_pdf')}
+                  </Button>
+                </Col>
+
+                <Col xs={24} md={8}>
+                  <Button
+                    block
+                    type="primary"
+                    onClick={() =>
+                      setAddAndUpdateVehicleRegistrationModal({
+                        open: true,
+                        record: null
+                      })
+                    }
+                  >
+                    {t('add_registration')}
+                  </Button>
                 </Col>
               </Row>
             </Card>
