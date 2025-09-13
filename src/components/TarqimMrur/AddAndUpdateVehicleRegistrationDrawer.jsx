@@ -84,10 +84,12 @@ const VehicleRegistrationDrawer = ({
   }, []);
 
   useEffect(() => {
+    console.log(registration?.customer_id, customerId);
     if (registration?.customer_id || customerId) {
-      getCustomerBatches(registration?.customer_id || customerId)
+      getCustomerBatches(customerId || registration?.customer_id)
         .then((data) => {
           setCustomerBatches(data);
+          console.log(data);
         })
         .catch((error) => {
           console.log(error);
@@ -294,6 +296,23 @@ const VehicleRegistrationDrawer = ({
                           .includes(input.toLowerCase())
                       }
                       style={{ width: '100%' }}
+                      onChange={(value) =>
+                        getCustomerBatches(
+                          customerId || registration?.customer_id
+                        )
+                          .then((data) => {
+                            setCustomerBatches(data);
+                            console.log(data);
+                          })
+                          .catch((error) => {
+                            console.log(error);
+                          })
+                          .finally(() => {
+                            form.setFieldsValue({
+                              batch_id: undefined
+                            });
+                          })
+                      }
                     />
                   ) : (
                     <Input

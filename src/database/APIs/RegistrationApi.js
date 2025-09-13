@@ -159,12 +159,30 @@ export const updateRegistration = async (
   let newBatchId = otherData.batch_id || oldBatchId;
 
   // 2️⃣ If user wants a new batch, create it
-  if (otherData.batch_name) {
+  if (otherData.batch_name || !otherData.old_batch) {
+    let batchName = otherData.batch_name;
+
+    if (!batchName || batchName.trim() === '') {
+      // Get existing batches for this customer to count them
+      const { data: existingBatches, error: countError } = await supabase
+        .from('batches')
+        .select('id')
+        .eq('customer_id', registrationData.customer_id || null)
+        .eq('batch_type', 'vehicle_registration');
+
+      if (countError) {
+        console.error('Error counting existing batches:', countError);
+        throw countError;
+      }
+
+      const batchNumber = (existingBatches?.length || 0) + 1;
+      batchName = `Batch ${batchNumber}`;
+    }
     const { data: newBatch, error: batchError } = await supabase
       .from('batches')
       .insert([
         {
-          name: otherData.batch_name,
+          name: otherData.batch_name || batchName,
           batch_type: 'vehicle_registration',
           customer_id: registrationData.customer_id || null
         }
