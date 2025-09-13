@@ -675,5 +675,6 @@
   "import_transportation_report": "Import Transportation Report",
   "export_date": "Export Date",
   "applied_filters": "Applied Filters",
-  "date_range": "Date Range"
+  "date_range": "Date Range",
+  "customer-activities": "Customer Activities"
 }

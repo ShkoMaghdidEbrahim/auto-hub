@@ -2,12 +2,15 @@ import { lazy } from 'react';
 import { MdSpaceDashboard, MdSwapHoriz, MdAssignment } from 'react-icons/md';
 import { FaUsersGear } from 'react-icons/fa6';
 import { FaListOl } from 'react-icons/fa';
+import { RxActivityLog } from 'react-icons/rx';
+import { GiCash } from 'react-icons/gi';
 
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const NaqllGumrg = lazy(() => import('./pages/NaqllGumrg.jsx'));
 const TarqimMrur = lazy(() => import('./pages/TarqimMrur.jsx'));
 const Users = lazy(() => import('./pages/Users.jsx'));
 const PredefinedValues = lazy(() => import('./pages/PredefinedValues.jsx'));
+const CustomerActivities = lazy(() => import('./pages/CustomerActivities.jsx'));
 
 const routes = [
   {
@@ -39,6 +42,15 @@ const routes = [
   },
   {
     key: 4,
+    path: '/customer-activities',
+    component: CustomerActivities,
+    icon: <GiCash style={{ fontSize: 20 }} />,
+    label: 'customer-activities',
+    permission: 'CustomerActivities',
+    show: true
+  },
+  {
+    key: 5,
     path: '/predefined-values',
     component: PredefinedValues,
     icon: <FaListOl style={{ fontSize: 20 }} />,
