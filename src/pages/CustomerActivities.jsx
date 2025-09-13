@@ -4,7 +4,7 @@ import { Card, Col, Row } from 'antd';
 import { useTranslation } from 'react-i18next';
 import CustomerProfileDrawer from '../components/CustomerActivities/CustomerProfileDrawer.jsx';
 
-const CustomerActivities = () => {
+const CustomerActivities = ({ color }) => {
   const { t } = useTranslation();
   const [Customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,13 @@ const CustomerActivities = () => {
                   style={{
                     cursor: 'pointer',
                     height: '100%',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                    borderColor: color
+                  }}
+                  styles={{
+                    header: {
+                      borderColor: color
+                    }
                   }}
                   title={customer.full_name}
                 >

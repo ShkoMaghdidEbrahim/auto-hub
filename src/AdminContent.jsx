@@ -87,7 +87,7 @@ function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
                     key={route.key}
                     element={
                       <Suspense fallback={<LoadingFallback />}>
-                        <route.component />
+                        <route.component color={color} />
                       </Suspense>
                     }
                   />
