@@ -1,8 +1,9 @@
-import { Col, Drawer, Row, Table, Card, Statistic, Tag } from 'antd';
+import { Col, Drawer, Row, Table, Card, Statistic, Tag, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { getCustomerActivities } from '../../database/APIs/CustomerActivities.js';
 import { useEffect, useState } from 'react';
 import BatchTransactionsDrawer from './BatchTransactionsDrawer.jsx';
+import RepaymentModal from './RepaymentModal.jsx';
 
 const CustomerProfileDrawer = ({ open, onClose, customer }) => {
   const { t } = useTranslation();
@@ -12,10 +13,11 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
     batch: null
   });
 
+  const [RepaymentModalOpen, setRepaymentModalOpen] = useState(false);
+
   useEffect(() => {
     if (!customer?.id) return;
     getCustomerActivities(customer.id).then((response) => {
-      console.log(response);
       setActivities(response);
     });
   }, [customer]);
@@ -95,7 +97,21 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
         footer={null}
       >
         <Row gutter={[16, 16]}>
-          {/* Summary Stats */}
+          <Col span={24}>
+            <Row gutter={[10, 10]}>
+              <Col span={24}>
+                <Button
+                  type="primary"
+                  block
+                  onClick={() => {
+                    setRepaymentModalOpen(true);
+                  }}
+                >
+                  {t('repayment')}
+                </Button>
+              </Col>
+            </Row>
+          </Col>
           <Col xs={24} sm={12} md={6}>
             <Card>
               <Statistic
@@ -170,6 +186,16 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
           batch={batchTransactionsDrawer.batch}
         />
       )}
+
+      {RepaymentModalOpen ? (
+        <RepaymentModal
+          open={RepaymentModalOpen}
+          onClose={() => setRepaymentModalOpen(false)}
+          batches={activities.filter(
+            (b) => b.outstanding.usd > 0 || b.outstanding.iqd > 0
+          )}
+        />
+      ) : null}
     </>
   );
 };

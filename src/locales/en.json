@@ -693,5 +693,9 @@
   "outstanding_usd": "Outstanding USD",
   "outstanding_iqd": "Outstanding IQD",
   "status": "Status",
-  "not_paid": "Not Paid"
+  "not_paid": "Not Paid",
+  "repayment": "repayment",
+  "batch_name_required": "batch_name_required",
+  "please_select_batch_and_record": "please_select_batch_and_record",
+  "no_details_available": "no_details_available"
 }

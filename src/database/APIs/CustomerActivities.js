@@ -20,7 +20,9 @@ export const getCustomerActivities = async (customerId) => {
         import_and_transportation (
           id,
           total_usd,
-          total_iqd
+          total_iqd,
+          car_name,
+          car_model
         ),
         vehicle_registrations (
           id,
@@ -35,7 +37,7 @@ export const getCustomerActivities = async (customerId) => {
 
     const num = (val) => (val ? Number(val) : 0);
 
-    const activities = batches.map((batch) => {
+    return batches.map((batch) => {
       const paidUsd = batch.transactions.reduce(
         (sum, t) => sum + num(t.amount_usd),
         0
@@ -70,17 +72,24 @@ export const getCustomerActivities = async (customerId) => {
         batchName: batch.name,
         batchType: batch.batch_type,
         createdAt: batch.created_at,
-        totals: { usd: totalUsd, iqd: totalIqd },
-        paid: { usd: paidUsd, iqd: paidIqd },
-        outstanding: { usd: outstandingUsd, iqd: outstandingIqd },
+        totals: {
+          usd: totalUsd,
+          iqd: totalIqd
+        },
+        paid: {
+          usd: paidUsd,
+          iqd: paidIqd
+        },
+        outstanding: {
+          usd: outstandingUsd,
+          iqd: outstandingIqd
+        },
         isPaid: outstandingUsd <= 0 && outstandingIqd <= 0,
         transactionsList: batch.transactions,
         importsList: batch.import_and_transportation,
         registrationsList: batch.vehicle_registrations
       };
     });
-
-    return activities;
   } catch (err) {
     console.error('Error fetching customer activities:', err);
     return [];

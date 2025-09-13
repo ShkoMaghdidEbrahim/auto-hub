@@ -694,5 +694,9 @@
   "outstanding_usd": "قەرزی دۆلار",
   "outstanding_iqd": "قەرزی دینار",
   "status": "دۆخ",
-  "not_paid": "پارە نەدراوە"
+  "not_paid": "پارە نەدراوە",
+  "repayment": "repayment",
+  "batch_name_required": "batch_name_required",
+  "please_select_batch_and_record": "please_select_batch_and_record",
+  "no_details_available": "no_details_available"
 }
