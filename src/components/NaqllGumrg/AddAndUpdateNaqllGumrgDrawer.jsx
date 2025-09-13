@@ -154,10 +154,12 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
         import_fee: Math.round(toNumber(values.import_fee)),
         import_system_fee: Math.round(toNumber(values.import_system_fee)),
         car_coc_fee: Math.round(toNumber(values.car_coc_fee) * 100) / 100, // Keep 2 decimal places
-        transportation_fee: Math.round(toNumber(values.transportation_fee) * 100) / 100,
+        transportation_fee:
+          Math.round(toNumber(values.transportation_fee) * 100) / 100,
         total_usd: Math.round(toNumber(values.total_usd) * 100) / 100,
         total_iqd: Math.round(toNumber(values.total_iqd)),
-        paid_amount_usd: Math.round(toNumber(values.paid_amount_usd) * 100) / 100,
+        paid_amount_usd:
+          Math.round(toNumber(values.paid_amount_usd) * 100) / 100,
         paid_amount_iqd: Math.round(toNumber(values.paid_amount_iqd)),
         usd_to_iqd_rate: Math.round(toNumber(values.exchange_rate)),
         note: values.note || null
@@ -233,14 +235,8 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
 
   const calculateTotal = () => {
     const values = form.getFieldsValue();
-    const usdFields = [
-      'car_coc_fee',
-      'transportation_fee'
-    ];
-    const iqdFields = [
-      'import_fee',
-      'import_system_fee',
-    ];
+    const usdFields = ['car_coc_fee', 'transportation_fee'];
+    const iqdFields = ['import_fee', 'import_system_fee'];
 
     const totalUsd = usdFields.reduce((sum, field) => {
       const value = values[field];
@@ -411,7 +407,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                   )}
                 </Form.Item>
               </Col>
-
 
               <Col xs={24} sm={12} md={8}>
                 <Form.Item
@@ -696,7 +691,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                           loading={loading}
                           options={customerBatches?.map((batch) => ({
                             value: batch.id,
-                            label: batch.note || `Batch #${batch.id}`
+                            label: batch.name || `Batch #${batch.id}`
                           }))}
                           filterOption={(input, option) =>
                             (option?.label ?? '')
