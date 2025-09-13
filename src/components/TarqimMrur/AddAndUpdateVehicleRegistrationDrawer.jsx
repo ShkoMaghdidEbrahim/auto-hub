@@ -777,7 +777,7 @@ const VehicleRegistrationDrawer = ({
                           loading={loading}
                           options={customerBatches?.map((batch) => ({
                             value: batch.id,
-                            label: batch.name
+                            label: batch.name || `Batch #${batch.id}`
                           }))}
                           filterOption={(input, option) =>
                             (option?.label ?? '')
