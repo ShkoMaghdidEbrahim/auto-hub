@@ -676,5 +676,22 @@
   "export_date": "Export Date",
   "applied_filters": "Applied Filters",
   "date_range": "Date Range",
-  "customer-activities": "Customer Activities"
+  "customer-activities": "Customer Activities",
+  "customer_profile": "Customer Profile",
+  "amount_usd": "Amount USD",
+  "amount_iqd": "Amount IQD",
+  "transactions_for_batch": "Transactions for Batch",
+  "imports": "Imports",
+  "registrations": "Registrations",
+  "batch_details": "Batch Details",
+  "registration_id": "Registration ID",
+  "import_id": "Import ID",
+  "import_and_transportation": "Import and Transportation",
+  "vehicle_registration": "Vehicle Registration",
+  "batch_id": "Batch ID",
+  "batch_type": "Batch Type",
+  "outstanding_usd": "Outstanding USD",
+  "outstanding_iqd": "Outstanding IQD",
+  "status": "Status",
+  "not_paid": "Not Paid"
 }

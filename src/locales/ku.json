@@ -677,5 +677,22 @@
   "export_date": "ڕێکەوتی دەرکردن",
   "applied_filters": "فلتەرە بەکارهێنراوەکان",
   "date_range": "ماوەی ڕێکەوت",
-  "customer-activities": "چالاکیەکانی کڕیار"
+  "customer-activities": "چالاکیەکانی کڕیار",
+  "customer_profile": "پرۆفایلی کڕیار",
+  "amount_usd": "بڕی دۆلار",
+  "amount_iqd": "بڕی دینار",
+  "transactions_for_batch": "مامەڵەکانی وەجبە",
+  "imports": "هاوردەکان",
+  "registrations": "تۆمارکردنەکان",
+  "batch_details": "وردەکاری وەجبە",
+  "registration_id": "ناسنامەی تۆمارکردن",
+  "import_id": "ناسنامەی هاوردە",
+  "import_and_transportation": "هاوردە و گواستنەوە",
+  "vehicle_registration": "تۆمارکردنی ئۆتۆمبێل",
+  "batch_id": "ناسنامەی وەجبە",
+  "batch_type": "جۆری وەجبە",
+  "outstanding_usd": "قەرزی دۆلار",
+  "outstanding_iqd": "قەرزی دینار",
+  "status": "دۆخ",
+  "not_paid": "پارە نەدراوە"
 }

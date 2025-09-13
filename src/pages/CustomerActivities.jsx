@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { getCustomers } from '../database/APIs/CustomersApi.js';
 import { Card, Col, Row } from 'antd';
+import { useTranslation } from 'react-i18next';
+import CustomerProfileDrawer from '../components/CustomerActivities/CustomerProfileDrawer.jsx';
 
 const CustomerActivities = () => {
+  const { t } = useTranslation();
   const [Customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [customerProfileDrawer, setCustomerProfileDrawer] = useState({
+    open: false,
+    customer: null
+  });
 
   useEffect(() => {
     getCustomers()
@@ -19,38 +26,68 @@ const CustomerActivities = () => {
   }, []);
 
   return (
-    <Card
-      style={{
-        minHeight: '100%',
-        borderRadius: 0
-      }}
-      variant={'borderless'}
-      key={'dashboard'}
-    >
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <Row gutter={[10, 10]}>
-          {Customers.map((customer) => (
-            <Col
-              key={customer.id}
-              xs={24}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={8}
-              style={{ padding: '10px' }}
-            >
-              <Card title={customer.full_name}>
-                <p>Email: {customer.email}</p>
-                <p>Phone: {customer.phone}</p>
-                <p>Address: {customer.address}</p>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
-    </Card>
+    <>
+      <Card
+        style={{
+          minHeight: '100%',
+          borderRadius: 0
+        }}
+        variant={'borderless'}
+        key={'dashboard'}
+      >
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <Row gutter={[10, 10]}>
+            {Customers.map((customer) => (
+              <Col
+                key={customer.id}
+                xs={24}
+                sm={12}
+                md={12}
+                lg={12}
+                xl={8}
+                style={{ padding: '10px' }}
+              >
+                <Card
+                  onClick={() =>
+                    setCustomerProfileDrawer({
+                      open: true,
+                      customer: customer
+                    })
+                  }
+                  style={{
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                  }}
+                  title={customer.full_name}
+                >
+                  <p>
+                    {t('email')}: {customer.email}
+                  </p>
+                  <p>
+                    {t('phone')}: {customer.phone}
+                  </p>
+                  <p>
+                    {t('address')}: {customer.address}
+                  </p>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+      </Card>
+
+      {customerProfileDrawer.open ? (
+        <CustomerProfileDrawer
+          open={customerProfileDrawer.open}
+          onClose={() =>
+            setCustomerProfileDrawer({ open: false, customer: null })
+          }
+          customer={customerProfileDrawer.customer}
+        />
+      ) : null}
+    </>
   );
 };
 
