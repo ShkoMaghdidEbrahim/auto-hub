@@ -315,8 +315,6 @@ const NaqllGumrg = () => {
       formatUSD(item.transportation_fee),
       formatUSD(item.total_usd),
       formatIQD(item.total_iqd),
-      formatUSD(item.paid_amount_usd),
-      formatIQD(item.paid_amount_iqd),
       new Date(item.created_at).toLocaleDateString()
     ]);
 
@@ -334,8 +332,6 @@ const NaqllGumrg = () => {
       t('transportation_fee'),
       t('total_usd'),
       t('total_iqd'),
-      t('paid_amount_usd'),
-      t('paid_amount_iqd'),
       t('created_at')
     ];
 
@@ -466,20 +462,6 @@ const NaqllGumrg = () => {
       dataIndex: 'total_iqd',
       key: 'total_iqd',
       width: 100,
-      render: (value) => formatIQD(value)
-    },
-    {
-      title: t('paid_amount_usd'),
-      dataIndex: 'paid_amount_usd',
-      key: 'paid_amount_usd',
-      width: 120,
-      render: (value) => formatUSD(value)
-    },
-    {
-      title: t('paid_amount_iqd'),
-      dataIndex: 'paid_amount_iqd',
-      key: 'paid_amount_iqd',
-      width: 120,
       render: (value) => formatIQD(value)
     },
     {

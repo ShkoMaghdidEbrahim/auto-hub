@@ -158,9 +158,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
           Math.round(toNumber(values.transportation_fee) * 100) / 100,
         total_usd: Math.round(toNumber(values.total_usd) * 100) / 100,
         total_iqd: Math.round(toNumber(values.total_iqd)),
-        paid_amount_usd:
-          Math.round(toNumber(values.paid_amount_usd) * 100) / 100,
-        paid_amount_iqd: Math.round(toNumber(values.paid_amount_iqd)),
         usd_to_iqd_rate: Math.round(toNumber(values.exchange_rate)),
         note: values.note || null
       };
@@ -544,7 +541,7 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                 </Form.Item>
               </Col>
 
-              <Col xs={24} sm={12} md={8}>
+              <Col xs={24} sm={12} md={6}>
                 <Form.Item label={t('exchange_rate')} name="exchange_rate">
                   <InputNumber
                     placeholder={t('enter_exchange_rate')}
@@ -556,46 +553,6 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                     formatter={(value) => `${Number(value).toLocaleString()}`}
                     addonBefore={'IQD'}
                     onChange={onMoneyFieldChange}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          </Card>
-
-          {/* Totals and Payments Section */}
-          <Card
-            title={
-              <span>
-                <DollarOutlined style={{ marginRight: '8px' }} />
-                {t('totals_and_payments')}
-              </span>
-            }
-            style={{ marginBottom: '24px' }}
-            size="small"
-          >
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item label={t('paid_usd')} name="paid_amount_usd">
-                  <InputNumber
-                    placeholder={t('enter_paid_usd')}
-                    style={{ width: '100%' }}
-                    min={0}
-                    precision={6}
-                    prefix="$"
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col xs={24} sm={12} md={6}>
-                <Form.Item label={t('paid_iqd')} name="paid_amount_iqd">
-                  <InputNumber
-                    placeholder={t('enter_paid_iqd')}
-                    style={{ width: '100%' }}
-                    min={0}
-                    formatter={(value) =>
-                      `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                    }
-                    parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
                   />
                 </Form.Item>
               </Col>
