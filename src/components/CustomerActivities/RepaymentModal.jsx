@@ -106,7 +106,7 @@ const RepaymentModal = ({ open, onClose, batches }) => {
       width={window.innerWidth > 768 ? '50%' : 800}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Row gutter={[10, 10]}>
+        <Row gutter={[10, 16]}>
           <Col xs={24} md={12}>
             <Form.Item
               style={{ margin: 0 }}
@@ -360,8 +360,8 @@ const RepaymentModal = ({ open, onClose, batches }) => {
               </Col>
             </>
           )}
-          <Col span={24} style={{ textAlign: 'right' }}>
-            <Button type="primary" htmlType="submit">
+          <Col span={24}>
+            <Button type="primary" block htmlType="submit">
               {t('submit')}
             </Button>
           </Col>
