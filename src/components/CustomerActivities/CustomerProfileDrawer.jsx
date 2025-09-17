@@ -164,7 +164,6 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
               rowKey="batchId"
               columns={columns}
               dataSource={activities}
-              pagination={false}
               onRow={(record) => ({
                 onClick: () =>
                   setBatchTransactionsDrawer({
@@ -172,6 +171,16 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
                     batch: record
                   })
               })}
+              scroll={{
+                x: 'max-content'
+              }}
+              pagination={{
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) =>
+                  `${range[0]}-${range[1]} ${t('of')} ${total} ${t('items')}`,
+                pageSizeOptions: ['10', '20', '50', '100']
+              }}
             />
           </Col>
         </Row>
