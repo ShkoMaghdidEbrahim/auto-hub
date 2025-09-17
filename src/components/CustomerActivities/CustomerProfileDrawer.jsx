@@ -179,7 +179,7 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
 
       {batchTransactionsDrawer.open && (
         <BatchTransactionsDrawer
-          open={batchTransactionsDrawer.open} // ✅ fixed
+          open={batchTransactionsDrawer.open}
           onClose={() =>
             setBatchTransactionsDrawer({ open: false, batch: null })
           }
@@ -190,7 +190,12 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
       {RepaymentModalOpen ? (
         <RepaymentModal
           open={RepaymentModalOpen}
-          onClose={() => setRepaymentModalOpen(false)}
+          onClose={() => {
+            setRepaymentModalOpen(false);
+            getCustomerActivities(customer.id).then((response) => {
+              setActivities(response);
+            });
+          }}
           batches={activities.filter(
             (b) => b.outstanding.usd > 0 || b.outstanding.iqd > 0
           )}

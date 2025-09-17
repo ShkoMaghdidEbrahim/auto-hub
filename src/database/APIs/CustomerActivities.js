@@ -10,24 +10,9 @@ export const getCustomerActivities = async (customerId) => {
         name,
         batch_type,
         created_at,
-        transactions (
-          id,
-          amount_iqd,
-          amount_usd,
-          note,
-          created_at
-        ),
-        import_and_transportation (
-          id,
-          total_usd,
-          total_iqd,
-          car_name,
-          car_model
-        ),
-        vehicle_registrations (
-          id,
-          total
-        )
+        transactions (*),
+        import_and_transportation (*),
+        vehicle_registrations (*)
       `
       )
       .eq('customer_id', customerId)
@@ -93,5 +78,21 @@ export const getCustomerActivities = async (customerId) => {
   } catch (err) {
     console.error('Error fetching customer activities:', err);
     return [];
+  }
+};
+
+export const addTransaction = async (transactionData) => {
+  try {
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert([transactionData])
+      .select();
+
+    if (error) throw error;
+
+    return data;
+  } catch (err) {
+    console.error('Error adding transaction:', err);
+    return null;
   }
 };

@@ -694,8 +694,19 @@
   "outstanding_iqd": "Outstanding IQD",
   "status": "Status",
   "not_paid": "Not Paid",
-  "repayment": "repayment",
-  "batch_name_required": "batch_name_required",
-  "please_select_batch_and_record": "please_select_batch_and_record",
-  "no_details_available": "no_details_available"
+  "repayment": "Repayment",
+  "batch_name_required": "Batch name is required",
+  "please_select_batch_and_record": "Please select a batch and record",
+  "no_details_available": "No details available",
+  "amount_exceeds_outstanding": "Amount exceeds outstanding",
+  "select_record": "Select record",
+  "record_is_required": "Record is required",
+  "record": "Record",
+  "transaction_added_successfully": "Transaction added successfully",
+  "failed_to_add_transaction": "Failed to add transaction",
+  "no_batch": "No batch",
+  "context_type": "Context type",
+  "unknown": "Unknown",
+  "context_id": "Context ID",
+  "search_customers": "Search Customers"
 }

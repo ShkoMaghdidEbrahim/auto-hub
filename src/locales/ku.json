@@ -695,8 +695,19 @@
   "outstanding_iqd": "قەرزی دینار",
   "status": "دۆخ",
   "not_paid": "پارە نەدراوە",
-  "repayment": "repayment",
-  "batch_name_required": "batch_name_required",
-  "please_select_batch_and_record": "please_select_batch_and_record",
-  "no_details_available": "no_details_available"
+  "repayment": "گەڕاندنەوەی پارە",
+  "batch_name_required": "ناوی وەجبە پێویستە",
+  "please_select_batch_and_record": "تکایە وەجبە و تۆمار هەڵبژێرە",
+  "no_details_available": "هیچ وردەکارییەک بەردەست نییە",
+  "amount_exceeds_outstanding": "بڕەکە زیاترە لە قەرزی ماوە",
+  "select_record": "تۆمار هەڵبژێرە",
+  "record_is_required": "تۆمار پێویستە",
+  "record": "تۆمار",
+  "transaction_added_successfully": "مامەڵە بە سەرکەوتوویی زیادکرا",
+  "failed_to_add_transaction": "شکستی هاتە زیادکردنی مامەڵە",
+  "no_batch": "هیچ وەجبەیەک نییە",
+  "context_type": "جۆری ناوەڕۆک",
+  "unknown": "نەناسراو",
+  "context_id": "ناسنامەی ناوەڕۆک",
+  "search_customers": "گەڕان بە دوای کڕیارەکان"
 }

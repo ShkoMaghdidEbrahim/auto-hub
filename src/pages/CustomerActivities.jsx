@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getCustomers } from '../database/APIs/CustomersApi.js';
-import { Card, Col, Row } from 'antd';
+import { Card, Col, Row, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import CustomerProfileDrawer from '../components/CustomerActivities/CustomerProfileDrawer.jsx';
 
@@ -8,6 +8,7 @@ const CustomerActivities = ({ color }) => {
   const { t } = useTranslation();
   const [Customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [customerProfileDrawer, setCustomerProfileDrawer] = useState({
     open: false,
     customer: null
@@ -35,11 +36,24 @@ const CustomerActivities = ({ color }) => {
         variant={'borderless'}
         key={'dashboard'}
       >
+        <Row style={{ marginBottom: 16 }}>
+          <Col span={24}>
+            <Input
+              placeholder={t('search_customers')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </Col>
+        </Row>
         {loading ? (
           <p>Loading...</p>
         ) : (
           <Row gutter={[16, 16]}>
-            {Customers.map((customer) => (
+            {Customers.filter((customer) =>
+              customer.full_name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
+            ).map((customer) => (
               <Col key={customer.id} xs={24} sm={12} md={12} lg={12} xl={8}>
                 <Card
                   onClick={() =>
