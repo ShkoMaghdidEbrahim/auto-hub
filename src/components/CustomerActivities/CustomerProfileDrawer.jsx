@@ -15,14 +15,14 @@ import {
   useTransactionColumns
 } from '../../helpers/TransactionColumns.js';
 import moment from 'moment';
+import i18n, { getDirection } from '../../locales/i18n.js';
 
 const formatUSD = (value) => `$${Number(value || 0).toFixed(2)}`;
 const formatIQD = (value) => `${Number(value || 0).toLocaleString()} IQD`;
 
 const CustomerProfileDrawer = ({ open, onClose, customer }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [activities, setActivities] = useState([]);
-  const [carSizes, setCarSizes] = useState([]);
   const [batchTransactionsDrawer, setBatchTransactionsDrawer] = useState({
     open: false,
     batch: null
@@ -30,7 +30,6 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
 
   const [RepaymentModalOpen, setRepaymentModalOpen] = useState(false);
 
-  console.log(activities);
   useEffect(() => {
     if (!customer?.id) return;
     getCustomerActivities(customer.id).then((response) => {
@@ -42,6 +41,8 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
   const importTransportationColumns = useImportTransportationColumns();
   const registrationColumns = useRegistrationColumns();
 
+  const isRTL = getDirection() === 'rtl';
+
   const exportPDF = async () => {
     try {
       // Initialize PDF with optimized settings
@@ -52,7 +53,6 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
         compress: false
       });
 
-      const isRTL = i18n.dir() === 'rtl';
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 20;
@@ -208,58 +208,79 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
         ];
 
         summaryCards.forEach((card, index) => {
-          const cardX = margin + (index % 2) * (cardWidth + 15);
-          if (index % 2 === 0 && index > 0) cardY += cardHeight + 15;
+          const colIndex = index % 2;
+          if (colIndex === 0 && index > 0) cardY += cardHeight + 15;
+
+          // Compute cardX based on direction
+          let cardX;
+          if (isRTL) {
+            cardX =
+              pageWidth - margin - (colIndex + 1) * cardWidth - colIndex * 15;
+          } else {
+            cardX = margin + colIndex * (cardWidth + 15);
+          }
 
           // Card background
           doc.setFillColor(...colors.white);
           doc.rect(cardX, cardY, cardWidth, cardHeight, 'F');
 
-          // Card border with color accent
+          // Card border
           doc.setDrawColor(...card.color);
           doc.setLineWidth(2);
           doc.rect(cardX, cardY, cardWidth, cardHeight, 'S');
 
-          // Color accent bar
+          // Accent bar (on correct side depending on RTL)
           doc.setFillColor(...card.color);
-          doc.rect(cardX, cardY, 5, cardHeight, 'F');
+          if (isRTL) {
+            doc.rect(cardX + cardWidth - 5, cardY, 5, cardHeight, 'F');
+          } else {
+            doc.rect(cardX, cardY, 5, cardHeight, 'F');
+          }
 
           // Label
           doc.setFontSize(11);
           doc.setFont('Vazirmatn-Regular', 'normal');
           doc.setTextColor(...colors.text);
-          doc.text(card.label, cardX + 15, cardY + 25, {
-            align: isRTL ? 'right' : 'left'
-          });
+          doc.text(
+            card.label,
+            cardX + (isRTL ? cardWidth - 15 : 15),
+            cardY + 25,
+            {
+              align: isRTL ? 'right' : 'left'
+            }
+          );
 
           // Value
           doc.setFontSize(14);
           doc.setFont('Vazirmatn-Bold', 'bold');
           doc.setTextColor(...card.color);
-          doc.text(card.value, cardX + 15, cardY + 45, {
-            align: isRTL ? 'right' : 'left'
-          });
+          doc.text(
+            card.value,
+            cardX + (isRTL ? cardWidth - 15 : 15),
+            cardY + 45,
+            {
+              align: isRTL ? 'right' : 'left'
+            }
+          );
         });
 
         return cardY + cardHeight + 30;
       };
+
       const addCustomerInfo = (startY) => {
         const cardHeight = 160;
         const cardY = startY + 20;
 
-        // Card background with rounded corners effect
+        // Card background and border
         doc.setFillColor(...colors.white);
         doc.rect(margin, cardY, pageWidth - margin * 2, cardHeight, 'F');
-
-        // Card border
         doc.setDrawColor(...colors.border);
         doc.setLineWidth(1);
         doc.rect(margin, cardY, pageWidth - margin * 2, cardHeight, 'S');
 
-        // Card header
+        // Header
         doc.setFillColor(...colors.light);
         doc.rect(margin + 1, cardY + 1, pageWidth - margin * 2 - 2, 35, 'F');
-
         doc.setTextColor(...colors.primary);
         doc.setFontSize(16);
         doc.setFont('Vazirmatn-Bold', 'bold');
@@ -270,11 +291,7 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
           { align: isRTL ? 'right' : 'left' }
         );
 
-        // Customer details in two columns
-        doc.setFontSize(12);
-        doc.setFont('Vazirmatn-Regular', 'normal');
-        doc.setTextColor(...colors.text);
-
+        // Customer info
         const customerInfo = [
           { label: t('customer_name'), value: customer?.full_name || '-' },
           { label: t('phone'), value: customer?.phone || '-' },
@@ -288,24 +305,46 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
           }
         ];
 
-        const leftColumnX = margin + 20;
-        const rightColumnX = pageWidth / 2 + 20;
+        const colGap = 20;
+        const colWidth = (pageWidth - margin * 2 - colGap) / 2;
+
+        const horizontalPadding = 35; // more space from page edges
 
         customerInfo.forEach((info, index) => {
-          const yPos = cardY + 55 + (index % 3) * 25;
-          const xPos = index < 3 ? leftColumnX : rightColumnX;
+          const yPos = cardY + 65 + (index % 3) * 25;
+          const isLeftCol = index < 3;
 
-          // Label
+          // Columns adjusted to have more padding from edges
+          let colX;
+          if (isRTL) {
+            colX = isLeftCol
+              ? pageWidth - margin - colWidth - horizontalPadding
+              : margin + horizontalPadding;
+          } else {
+            colX = isLeftCol
+              ? margin + horizontalPadding
+              : margin + colWidth + colGap;
+          }
+
+          // Label with flipped colon for RTL
           doc.setFont('Vazirmatn-Bold', 'bold');
           doc.setTextColor(...colors.secondary);
-          doc.text(`${info.label}:`, xPos, yPos, {
+          const labelText = isRTL ? `:${info.label}` : `${info.label}:`;
+          const labelWidth = doc.getTextWidth(labelText);
+
+          const labelX = isRTL ? colX + colWidth : colX;
+          const valueX = isRTL
+            ? labelX - labelWidth - 5
+            : labelX + labelWidth + 5;
+
+          doc.text(labelText, labelX, yPos, {
             align: isRTL ? 'right' : 'left'
           });
 
           // Value
           doc.setFont('Vazirmatn-Regular', 'normal');
           doc.setTextColor(...colors.text);
-          doc.text(info.value, xPos + (isRTL ? -10 : 120), yPos, {
+          doc.text(info.value, valueX, yPos, {
             align: isRTL ? 'right' : 'left'
           });
         });
@@ -388,7 +427,7 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
           styles: {
             font: 'Vazirmatn-Regular',
             fontStyle: 'normal',
-            fontSize: 9,
+            fontSize: 8,
             cellPadding: { top: 8, bottom: 8, left: 6, right: 6 },
             overflow: 'linebreak',
             halign: isRTL ? 'right' : 'left',
@@ -402,7 +441,7 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
             textColor: colors.white,
             font: 'Vazirmatn-Bold',
             fontStyle: 'bold',
-            fontSize: 10,
+            fontSize: 8,
             halign: 'center'
           },
           alternateRowStyles: {
