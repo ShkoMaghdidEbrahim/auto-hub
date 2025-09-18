@@ -734,7 +734,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} md={5}>
+                <Col xs={24} md={4}>
                   <Select
                     placeholder={
                       filters.customer
@@ -781,7 +781,7 @@ const TarqimMrur = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} md={4}>
+                <Col xs={24} md={5}>
                   <DatePicker.RangePicker
                     placeholder={[t('start_date'), t('end_date')]}
                     value={filters.dateRange}
