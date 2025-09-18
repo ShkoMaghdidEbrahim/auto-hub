@@ -4,10 +4,12 @@ import { initReactI18next } from 'react-i18next';
 
 import translationKU from './ku.json';
 import translationEN from './en.json';
+import translationAR from './ar.json';
 
 const resources = {
   ku: { translation: translationKU },
-  en: { translation: translationEN }
+  en: { translation: translationEN },
+  ar: { translation: translationAR }
 };
 
 const RTL_LANGUAGES = ['ku', 'ar', 'fa', 'he', 'ur'];

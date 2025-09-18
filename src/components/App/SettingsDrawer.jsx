@@ -100,6 +100,10 @@ const SettingsDrawer = ({
                   {
                     label: t('kurdish'),
                     value: 'ku'
+                  },
+                  {
+                    label: t('arabic'),
+                    value: 'ar'
                   }
                 ]}
                 defaultValue={getCurrentLanguage()}

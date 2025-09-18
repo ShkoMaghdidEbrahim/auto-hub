@@ -749,5 +749,6 @@
   "detailed_report": "Detailed Report",
   "generated_on": "Generated on",
   "export_transactions": "Export Transactions",
-  "usd_to_iqd_rate": "USD to IQD Rate"
+  "usd_to_iqd_rate": "USD to IQD Rate",
+  "arabic": "Arabic"
 }
