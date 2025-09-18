@@ -785,12 +785,15 @@ const AddAndUpdateNaqllGumrgDrawer = ({ open, record, onClose, onSuccess }) => {
                         name="batch_name"
                         rules={[
                           {
-                            required: !oldBatch,
+                            required: false,
                             message: t('please_write_batch_name')
                           }
                         ]}
                       >
-                        <Input placeholder={t('batch_name')} />
+                        <Input 
+                          placeholder={t('batch')} 
+                          allowClear
+                        />
                       </Form.Item>
                     </Col>
                   )}
