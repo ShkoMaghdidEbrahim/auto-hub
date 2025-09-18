@@ -718,5 +718,6 @@
   "unknown_customer": "کڕیاری نەناسراو",
   "detailed_report": "ڕاپۆرتی وردەکاری",
   "generated_on": "دروستکراوە لە",
-  "export_transactions": "دەرکردنی مامەڵەکان"
+  "export_transactions": "دەرکردنی مامەڵەکان",
+  "usd_to_iqd_rate": "نرخی دۆلار بۆ دینار"
 }

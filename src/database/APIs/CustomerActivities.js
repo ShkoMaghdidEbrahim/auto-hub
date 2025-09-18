@@ -11,8 +11,13 @@ export const getCustomerActivities = async (customerId) => {
         batch_type,
         created_at,
         transactions (*),
-        import_and_transportation (*),
-        vehicle_registrations (*)
+        import_and_transportation (
+          *
+        ),
+        vehicle_registrations (
+          *,
+          vehicle_size_types:vehicle_size (name)
+        )
       `
       )
       .eq('customer_id', customerId)

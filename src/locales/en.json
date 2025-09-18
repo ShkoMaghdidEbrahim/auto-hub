@@ -717,5 +717,6 @@
   "unknown_customer": "Unknown Customer",
   "detailed_report": "Detailed Report",
   "generated_on": "Generated on",
-  "export_transactions": "Export Transactions"
+  "export_transactions": "Export Transactions",
+  "usd_to_iqd_rate": "USD to IQD Rate"
 }

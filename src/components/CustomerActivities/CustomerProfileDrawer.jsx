@@ -6,14 +6,15 @@ import BatchTransactionsDrawer from './BatchTransactionsDrawer.jsx';
 import RepaymentModal from './RepaymentModal.jsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import {
-  importTransportationColumns,
-  registrationColumns,
-  transactionColumns
-} from '../../helpers/TransactionColumns.js';
 
 import '../../helpers/Vazirmatn-Bold-bold.js';
 import '../../helpers/Vazirmatn-Regular-normal.js';
+import {
+  useImportTransportationColumns,
+  useRegistrationColumns,
+  useTransactionColumns
+} from '../../helpers/TransactionColumns.js';
+import moment from 'moment';
 
 const formatUSD = (value) => `$${Number(value || 0).toFixed(2)}`;
 const formatIQD = (value) => `${Number(value || 0).toLocaleString()} IQD`;
@@ -21,20 +22,25 @@ const formatIQD = (value) => `${Number(value || 0).toLocaleString()} IQD`;
 const CustomerProfileDrawer = ({ open, onClose, customer }) => {
   const { t, i18n } = useTranslation();
   const [activities, setActivities] = useState([]);
+  const [carSizes, setCarSizes] = useState([]);
   const [batchTransactionsDrawer, setBatchTransactionsDrawer] = useState({
     open: false,
     batch: null
   });
 
-  console.log(activities);
   const [RepaymentModalOpen, setRepaymentModalOpen] = useState(false);
 
+  console.log(activities);
   useEffect(() => {
     if (!customer?.id) return;
     getCustomerActivities(customer.id).then((response) => {
       setActivities(response || []);
     });
   }, [customer]);
+
+  const transactionColumns = useTransactionColumns();
+  const importTransportationColumns = useImportTransportationColumns();
+  const registrationColumns = useRegistrationColumns();
 
   const exportPDF = async () => {
     try {
@@ -432,10 +438,15 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
             activities?.flatMap((b) =>
               (b.importsList || []).map((item) => ({
                 ...item,
-                batchId: b.batchId,
                 batchName: b.batchName,
-                batchType: b.batchType,
-                createdAt: b.createdAt
+                created_at: moment(item.created_at).format('YYYY-MM-DD HH:mm'),
+                total_usd: formatUSD(item.usd),
+                total_iqd: formatIQD(item.iqd),
+                import_fee: formatIQD(item.import_fee),
+                import_system_fee: formatIQD(item.import_system_fee),
+                car_coc_fee: formatUSD(item.car_coc_fee),
+                transportation_fee: formatUSD(item.transportation_fee),
+                usd_to_iqd_rate: formatIQD(item.usd_to_iqd_rate)
               }))
             ) || []
         },
@@ -446,10 +457,21 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
             activities?.flatMap((b) =>
               (b.registrationsList || []).map((item) => ({
                 ...item,
-                batchId: b.batchId,
                 batchName: b.batchName,
-                batchType: b.batchType,
-                createdAt: b.createdAt
+                created_at: moment(item.created_at).format('YYYY-MM-DD HH:mm'),
+                total_usd: formatUSD(item.usd),
+                total_iqd: formatIQD(item.iqd),
+                size_fee: formatIQD(item.size_fee),
+                plate_number_cost: formatIQD(item.plate_number_cost),
+                legal_cost: formatIQD(item.legal_cost),
+                inspection_cost: formatIQD(item.inspection_cost),
+                electronic_contract_cost: formatIQD(
+                  item.electronic_contract_cost
+                ),
+                window_check_cost: formatIQD(item.window_check_cost),
+                expenses: formatIQD(item.expenses),
+                labor_fees: formatIQD(item.labor_fees),
+                total: formatIQD(item.total)
               }))
             ) || []
         },
@@ -460,10 +482,11 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
             activities?.flatMap((b) =>
               (b.transactionsList || []).map((item) => ({
                 ...item,
-                batchId: b.batchId,
                 batchName: b.batchName,
-                batchType: b.batchType,
-                createdAt: b.createdAt
+                created_at: moment(item.created_at).format('YYYY-MM-DD HH:mm'),
+                context_type: t(item.context_type) || item.context_type,
+                amount_usd: formatUSD(item.amount_usd),
+                amount_iqd: formatIQD(item.amount_iqd)
               }))
             ) || []
         }
