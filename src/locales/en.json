@@ -708,5 +708,7 @@
   "context_type": "Context type",
   "unknown": "Unknown",
   "context_id": "Context ID",
-  "search_customers": "Search Customers"
+  "search_customers": "Search Customers",
+  "customer_transactions": "customer_transactions",
+  "imports_and_transportation": "imports_and_transportation"
 }

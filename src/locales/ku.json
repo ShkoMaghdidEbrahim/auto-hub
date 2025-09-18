@@ -709,5 +709,7 @@
   "context_type": "جۆری ناوەڕۆک",
   "unknown": "نەناسراو",
   "context_id": "ناسنامەی ناوەڕۆک",
-  "search_customers": "گەڕان بە دوای کڕیارەکان"
+  "search_customers": "گەڕان بە دوای کڕیارەکان",
+  "customer_transactions": "customer_transactions",
+  "imports_and_transportation": "imports_and_transportation"
 }
