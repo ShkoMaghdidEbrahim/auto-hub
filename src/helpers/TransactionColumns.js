@@ -7,8 +7,8 @@ export const transactionColumns = [
   },
   {
     title: 'Batch ID',
-    dataIndex: 'batch_id',
-    key: 'batch_id'
+    dataIndex: 'batchName',
+    key: 'batchName'
   },
   {
     title: 'Amount IQD',
@@ -49,8 +49,7 @@ export const transactionColumns = [
 
 export const importTransportationColumns = [
   { title: 'VIN', dataIndex: 'vin_number', key: 'vin_number' },
-  { title: 'Customer', dataIndex: 'customer', key: 'full_name' },
-  { title: 'Batch', dataIndex: 'batch', key: 'batch' },
+  { title: 'Batch', dataIndex: 'batchName', key: 'batchName' },
   { title: 'Car Name', dataIndex: 'car_name', key: 'car_name' },
   { title: 'Car Model', dataIndex: 'car_model', key: 'car_model' },
   { title: 'Car Color', dataIndex: 'car_color', key: 'car_color' },
@@ -74,8 +73,7 @@ export const importTransportationColumns = [
 
 export const registrationColumns = [
   { title: 'VIN', dataIndex: 'vin_number', key: 'vin_number' },
-  { title: 'Customer', dataIndex: 'customer', key: 'full_name' },
-  { title: 'Batch', dataIndex: 'batch', key: 'batch' },
+  { title: 'Batch', dataIndex: 'batchName', key: 'batchName' },
   { title: 'Car Name', dataIndex: 'car_name', key: 'car_name' },
   { title: 'Car Model', dataIndex: 'car_model', key: 'car_model' },
   {

@@ -25,9 +25,9 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
     open: false,
     batch: null
   });
-  const [RepaymentModalOpen, setRepaymentModalOpen] = useState(false);
 
-  console.log(customer);
+  console.log(activities);
+  const [RepaymentModalOpen, setRepaymentModalOpen] = useState(false);
 
   useEffect(() => {
     if (!customer?.id) return;
@@ -36,164 +36,487 @@ const CustomerProfileDrawer = ({ open, onClose, customer }) => {
     });
   }, [customer]);
 
-  console.log(i18n.dir());
-
-  const exportPDF = () => {
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'pt',
-      format: 'a3'
-    });
-
-    const isRTL = i18n.dir() === 'rtl';
-
-    doc.setFont('Vazirmatn-Bold', 'bold');
-    doc.setLanguage(i18n.language);
-
-    const pageWidth = doc.internal.pageSize.getWidth();
+  const exportPDF = async () => {
     try {
-      const logoImg = new Image();
-      logoImg.src = '/logo.png';
-      const logoX = isRTL ? pageWidth - 50 : 20;
-      doc.addImage(logoImg, 'PNG', logoX, 10, 30, 20);
-    } catch {
-      console.log('Logo not found, continuing without logo');
-    }
-
-    doc.setFontSize(16);
-    doc.text(
-      `${t('customer_transactions')} - ${customer?.full_name || ''}`,
-      isRTL ? doc.internal.pageSize.width - 40 : 40,
-      40,
-      { align: isRTL ? 'right' : 'left' }
-    );
-
-    doc.setFontSize(12);
-    const customerInfo = [
-      `${t('customer_name')}: ${customer?.full_name || '-'}`,
-      `${t('phone')}: ${customer?.phone || '-'}`,
-      `${t('email')}: ${customer?.email || '-'}`,
-      `${t('address')}: ${customer?.address || '-'}`,
-      `${t('created_at')}: ${new Date(customer?.created_at).toLocaleDateString()}`
-    ];
-    customerInfo.forEach((line, i) => {
-      doc.text(
-        line,
-        isRTL ? doc.internal.pageSize.width - 40 : 40,
-        70 + i * 18,
-        { align: isRTL ? 'right' : 'left' }
-      );
-    });
-
-    const addTable = (title, columns, data) => {
-      if (!data.length) return;
-
-      doc.addPage();
-      doc.setFontSize(14);
-      doc.text(title, isRTL ? doc.internal.pageSize.width - 40 : 40, 40, {
-        align: isRTL ? 'right' : 'left'
+      // Initialize PDF with optimized settings
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'pt',
+        format: 'a3',
+        compress: false
       });
 
-      const tableColumns = columns.map((col) => ({
-        header: col.title,
-        dataKey: col.key
-      }));
+      const isRTL = i18n.dir() === 'rtl';
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 20;
 
-      const tableData = data.map((row) => {
-        const rowData = {};
-        columns.forEach((col) => {
-          if (col.render) {
-            rowData[col.key] = col.render(row[col.dataIndex], row);
-          } else if (Array.isArray(col.dataIndex)) {
-            rowData[col.key] = row[col.dataIndex[0]]?.[col.dataIndex[1]] ?? '-';
-          } else {
-            rowData[col.key] = row[col.dataIndex] ?? '-';
+      // Color scheme
+      const colors = {
+        primary: [52, 152, 219], // Blue
+        secondary: [46, 125, 50], // Green
+        accent: [255, 193, 7], // Amber
+        text: [33, 37, 41], // Dark gray
+        light: [248, 249, 250], // Light gray
+        white: [255, 255, 255],
+        border: [222, 226, 230] // Light border
+      };
+
+      // Set up fonts
+      doc.setFont('Vazirmatn-Bold', 'bold');
+      doc.setLanguage(i18n.language);
+
+      // Helper function to add decorative header
+      const addPageHeader = (title, subtitle = '') => {
+        // Add gradient-like background header
+        doc.setFillColor(...colors.primary);
+        doc.rect(0, 0, pageWidth, 80, 'F');
+
+        // Logo handling with better error management
+        try {
+          const logoImg = new Image();
+          logoImg.onload = () => {
+            const logoSize = 40;
+            const logoX = isRTL ? pageWidth - margin - logoSize : margin;
+            doc.addImage(logoImg, 'PNG', logoX, 20, logoSize, logoSize);
+          };
+          logoImg.onerror = () => {
+            console.warn('Logo not found, adding placeholder');
+            // Add placeholder logo circle
+            doc.setFillColor(...colors.white);
+            const logoX = isRTL ? pageWidth - margin - 20 : margin;
+            doc.circle(logoX + 20, 40, 20, 'F');
+            doc.setTextColor(...colors.primary);
+            doc.setFontSize(16);
+            doc.text('LOGO', logoX + 20, 45, { align: 'center' });
+          };
+          logoImg.src = '/logo.png';
+        } catch (error) {
+          console.error('Error loading logo:', error);
+        }
+
+        // Main title with shadow effect
+        doc.setTextColor(...colors.white);
+        doc.setFontSize(24);
+        doc.setFont('Vazirmatn-Bold', 'bold');
+
+        const titleX = isRTL ? pageWidth - margin - 100 : margin + 80;
+        // Shadow
+        doc.setTextColor(0, 0, 0, 0.3);
+        doc.text(title, titleX + 1, 46, { align: isRTL ? 'right' : 'left' });
+        // Main text
+        doc.setTextColor(...colors.white);
+        doc.text(title, titleX, 45, { align: isRTL ? 'right' : 'left' });
+
+        // Subtitle
+        if (subtitle) {
+          doc.setFontSize(14);
+          doc.setFont('Vazirmatn-Regular', 'normal');
+          doc.setTextColor(255, 255, 255, 0.9);
+          doc.text(subtitle, titleX, 65, { align: isRTL ? 'right' : 'left' });
+        }
+
+        // Add date and time
+        const now = new Date();
+        const dateStr =
+          now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+        doc.setFontSize(10);
+        const dateX = isRTL ? margin : pageWidth - margin;
+        doc.text(dateStr, dateX, 25, { align: isRTL ? 'left' : 'right' });
+
+        return 100; // Return next Y position
+      };
+
+      // Enhanced summary section on first page
+      const addSummarySection = (startY) => {
+        const sectionY = startY + 20;
+
+        // Section header
+        doc.setFillColor(...colors.light);
+        doc.rect(margin, sectionY, pageWidth - margin * 2, 35, 'F');
+
+        doc.setTextColor(...colors.primary);
+        doc.setFontSize(16);
+        doc.setFont('Vazirmatn-Bold', 'bold');
+        doc.text(
+          t('financial_summary') || 'Financial Summary',
+          isRTL ? pageWidth - margin - 20 : margin + 20,
+          sectionY + 25,
+          { align: isRTL ? 'right' : 'left' }
+        );
+
+        // Calculate totals with error handling
+        const totals = {
+          totalUsd:
+            activities?.reduce((s, b) => s + (Number(b.totals?.usd) || 0), 0) ||
+            0,
+          totalIqd:
+            activities?.reduce((s, b) => s + (Number(b.totals?.iqd) || 0), 0) ||
+            0,
+          outstandingUsd:
+            activities?.reduce(
+              (s, b) => s + (Number(b.outstanding?.usd) || 0),
+              0
+            ) || 0,
+          outstandingIqd:
+            activities?.reduce(
+              (s, b) => s + (Number(b.outstanding?.iqd) || 0),
+              0
+            ) || 0
+        };
+
+        // Summary cards layout
+        const cardWidth = (pageWidth - margin * 2 - 15) / 2;
+        const cardHeight = 70;
+        let cardY = sectionY + 50;
+
+        const summaryCards = [
+          {
+            label: t('total_usd') || 'Total USD',
+            value: formatUSD
+              ? formatUSD(totals.totalUsd)
+              : `${totals.totalUsd.toFixed(2)}`,
+            color: colors.primary
+          },
+          {
+            label: t('total_iqd') || 'Total IQD',
+            value: formatIQD
+              ? formatIQD(totals.totalIqd)
+              : `${totals.totalIqd.toLocaleString()} IQD`,
+            color: colors.secondary
+          },
+          {
+            label: t('outstanding_usd') || 'Outstanding USD',
+            value: formatUSD
+              ? formatUSD(totals.outstandingUsd)
+              : `${totals.outstandingUsd.toFixed(2)}`,
+            color: colors.accent
+          },
+          {
+            label: t('outstanding_iqd') || 'Outstanding IQD',
+            value: formatIQD
+              ? formatIQD(totals.outstandingIqd)
+              : `${totals.outstandingIqd.toLocaleString()} IQD`,
+            color: colors.primary
           }
+        ];
+
+        summaryCards.forEach((card, index) => {
+          const cardX = margin + (index % 2) * (cardWidth + 15);
+          if (index % 2 === 0 && index > 0) cardY += cardHeight + 15;
+
+          // Card background
+          doc.setFillColor(...colors.white);
+          doc.rect(cardX, cardY, cardWidth, cardHeight, 'F');
+
+          // Card border with color accent
+          doc.setDrawColor(...card.color);
+          doc.setLineWidth(2);
+          doc.rect(cardX, cardY, cardWidth, cardHeight, 'S');
+
+          // Color accent bar
+          doc.setFillColor(...card.color);
+          doc.rect(cardX, cardY, 5, cardHeight, 'F');
+
+          // Label
+          doc.setFontSize(11);
+          doc.setFont('Vazirmatn-Regular', 'normal');
+          doc.setTextColor(...colors.text);
+          doc.text(card.label, cardX + 15, cardY + 25, {
+            align: isRTL ? 'right' : 'left'
+          });
+
+          // Value
+          doc.setFontSize(14);
+          doc.setFont('Vazirmatn-Bold', 'bold');
+          doc.setTextColor(...card.color);
+          doc.text(card.value, cardX + 15, cardY + 45, {
+            align: isRTL ? 'right' : 'left'
+          });
         });
-        return rowData;
+
+        return cardY + cardHeight + 30;
+      };
+      const addCustomerInfo = (startY) => {
+        const cardHeight = 160;
+        const cardY = startY + 20;
+
+        // Card background with rounded corners effect
+        doc.setFillColor(...colors.white);
+        doc.rect(margin, cardY, pageWidth - margin * 2, cardHeight, 'F');
+
+        // Card border
+        doc.setDrawColor(...colors.border);
+        doc.setLineWidth(1);
+        doc.rect(margin, cardY, pageWidth - margin * 2, cardHeight, 'S');
+
+        // Card header
+        doc.setFillColor(...colors.light);
+        doc.rect(margin + 1, cardY + 1, pageWidth - margin * 2 - 2, 35, 'F');
+
+        doc.setTextColor(...colors.primary);
+        doc.setFontSize(16);
+        doc.setFont('Vazirmatn-Bold', 'bold');
+        doc.text(
+          t('customer_information'),
+          isRTL ? pageWidth - margin - 20 : margin + 20,
+          cardY + 25,
+          { align: isRTL ? 'right' : 'left' }
+        );
+
+        // Customer details in two columns
+        doc.setFontSize(12);
+        doc.setFont('Vazirmatn-Regular', 'normal');
+        doc.setTextColor(...colors.text);
+
+        const customerInfo = [
+          { label: t('customer_name'), value: customer?.full_name || '-' },
+          { label: t('phone'), value: customer?.phone || '-' },
+          { label: t('email'), value: customer?.email || '-' },
+          { label: t('address'), value: customer?.address || '-' },
+          {
+            label: t('created_at'),
+            value: customer?.created_at
+              ? new Date(customer.created_at).toLocaleDateString()
+              : '-'
+          }
+        ];
+
+        const leftColumnX = margin + 20;
+        const rightColumnX = pageWidth / 2 + 20;
+
+        customerInfo.forEach((info, index) => {
+          const yPos = cardY + 55 + (index % 3) * 25;
+          const xPos = index < 3 ? leftColumnX : rightColumnX;
+
+          // Label
+          doc.setFont('Vazirmatn-Bold', 'bold');
+          doc.setTextColor(...colors.secondary);
+          doc.text(`${info.label}:`, xPos, yPos, {
+            align: isRTL ? 'right' : 'left'
+          });
+
+          // Value
+          doc.setFont('Vazirmatn-Regular', 'normal');
+          doc.setTextColor(...colors.text);
+          doc.text(info.value, xPos + (isRTL ? -10 : 120), yPos, {
+            align: isRTL ? 'right' : 'left'
+          });
+        });
+
+        return cardY + cardHeight + 40;
+      };
+
+      // Enhanced table styling
+      const createStyledTable = (title, columns, data, startY = 40) => {
+        if (!data || data.length === 0) {
+          // Add "No data" message with styling
+          doc.setFillColor(...colors.light);
+          doc.rect(margin, startY, pageWidth - margin * 2, 60, 'F');
+          doc.setTextColor(...colors.text);
+          doc.setFontSize(14);
+          doc.text(
+            `${title} - ${t('no_data_available') || 'No data available'}`,
+            pageWidth / 2,
+            startY + 35,
+            { align: 'center' }
+          );
+          return startY + 80;
+        }
+
+        // Section title with decorative line
+        doc.setFontSize(18);
+        doc.setFont('Vazirmatn-Bold', 'bold');
+        doc.setTextColor(...colors.primary);
+
+        const titleY = startY + 20;
+        doc.text(title, isRTL ? pageWidth - margin : margin, titleY, {
+          align: isRTL ? 'right' : 'left'
+        });
+
+        // Decorative line under title
+        doc.setDrawColor(...colors.accent);
+        doc.setLineWidth(3);
+        const lineY = titleY + 5;
+        if (isRTL) {
+          doc.line(pageWidth - margin - 100, lineY, pageWidth - margin, lineY);
+        } else {
+          doc.line(margin, lineY, margin + 100, lineY);
+        }
+
+        // Prepare table data with better formatting
+        const tableColumns = columns.map((col) => ({
+          header: col.title || col.header,
+          dataKey: col.key || col.dataIndex
+        }));
+
+        const tableData = data.map((row) => {
+          const rowData = {};
+          columns.forEach((col) => {
+            const key = col.key || col.dataIndex;
+            let value = '-';
+
+            try {
+              if (col.render && typeof col.render === 'function') {
+                value = col.render(row[col.dataIndex], row);
+              } else if (Array.isArray(col.dataIndex)) {
+                value = row[col.dataIndex[0]]?.[col.dataIndex[1]] ?? '-';
+              } else {
+                value = row[col.dataIndex] ?? '-';
+              }
+            } catch (error) {
+              console.error('Error processing table data:', error);
+              value = '-';
+            }
+
+            rowData[key] = String(value);
+          });
+          return rowData;
+        });
+
+        // Create table with enhanced styling
+        autoTable(doc, {
+          startY: titleY + 20,
+          head: [tableColumns.map((c) => c.header)],
+          body: tableData.map((row) => tableColumns.map((c) => row[c.dataKey])),
+          styles: {
+            font: 'Vazirmatn-Regular',
+            fontStyle: 'normal',
+            fontSize: 9,
+            cellPadding: { top: 8, bottom: 8, left: 6, right: 6 },
+            overflow: 'linebreak',
+            halign: isRTL ? 'right' : 'left',
+            valign: 'middle',
+            textColor: colors.text,
+            lineColor: colors.border,
+            lineWidth: 0.5
+          },
+          headStyles: {
+            fillColor: colors.primary,
+            textColor: colors.white,
+            font: 'Vazirmatn-Bold',
+            fontStyle: 'bold',
+            fontSize: 10,
+            halign: 'center'
+          },
+          alternateRowStyles: {
+            fillColor: colors.light
+          },
+          columnStyles: {
+            0: { cellWidth: 'auto', minCellWidth: 50 }
+          },
+          theme: 'striped',
+          tableWidth: 'auto',
+          margin: { left: margin, right: margin },
+          showHead: 'everyPage'
+        });
+
+        return doc.lastAutoTable.finalY + 30;
+      };
+
+      // Generate PDF content
+      let currentY = addPageHeader(
+        `${t('customer_transactions')} - ${customer?.full_name || t('unknown_customer') || 'Unknown Customer'}`,
+        t('detailed_report') || 'Detailed Report'
+      );
+
+      currentY = addCustomerInfo(currentY);
+      currentY = addSummarySection(currentY);
+
+      const sections = [
+        {
+          title:
+            t('imports_and_transportation') || 'Imports and Transportation',
+          columns: importTransportationColumns,
+          data:
+            activities?.flatMap((b) =>
+              (b.importsList || []).map((item) => ({
+                ...item,
+                batchId: b.batchId,
+                batchName: b.batchName,
+                batchType: b.batchType,
+                createdAt: b.createdAt
+              }))
+            ) || []
+        },
+        {
+          title: t('registrations') || 'Registrations',
+          columns: registrationColumns,
+          data:
+            activities?.flatMap((b) =>
+              (b.registrationsList || []).map((item) => ({
+                ...item,
+                batchId: b.batchId,
+                batchName: b.batchName,
+                batchType: b.batchType,
+                createdAt: b.createdAt
+              }))
+            ) || []
+        },
+        {
+          title: t('transactions') || 'Transactions',
+          columns: transactionColumns,
+          data:
+            activities?.flatMap((b) =>
+              (b.transactionsList || []).map((item) => ({
+                ...item,
+                batchId: b.batchId,
+                batchName: b.batchName,
+                batchType: b.batchType,
+                createdAt: b.createdAt
+              }))
+            ) || []
+        }
+      ];
+
+      sections.forEach((section) => {
+        if (section.data.length > 0) {
+          doc.addPage();
+          createStyledTable(section.title, section.columns, section.data);
+        }
       });
 
-      autoTable(doc, {
-        startY: 20,
-        head: [tableColumns.map((c) => c.header)],
-        body: tableData.map((row) => tableColumns.map((c) => row[c.dataKey])),
-        styles: {
-          font: 'Vazirmatn-Regular',
-          fontStyle: 'normal',
-          cellWidth: 'wrap',
-          minCellWidth: 40,
-          fontSize: 8,
-          cellPadding: 2,
-          overflow: 'linebreak',
-          halign: isRTL ? 'right' : 'left',
-          valign: 'middle'
-        },
-        headStyles: {
-          fillColor: [52, 152, 219],
-          textColor: 255,
-          font: 'Vazirmatn-Bold',
-          fontStyle: 'bold'
-        },
-        alternateRowStyles: {
-          fillColor: '#f5f5f5'
-        },
-        tableWidth: 'auto',
-        showHead: 'everyPage',
-        margin: isRTL ? { right: 10, left: 10 } : { left: 10, right: 10 },
-        showFoot: 'everyPage',
-        theme: 'striped'
-      });
-    };
+      const addFooter = () => {
+        const footerY = pageHeight - 30;
+        doc.setFontSize(8);
+        doc.setTextColor(...colors.text);
+        doc.setFont('Vazirmatn-Regular', 'normal');
 
-    const allImports = activities.flatMap((b) => b.importsList || []);
-    addTable(
-      t('imports_and_transportation'),
-      importTransportationColumns,
-      allImports
-    );
+        const footerText = `${t('generated_on') || 'Generated on'}: ${new Date().toLocaleString()} | ${t('page') || 'Page'} ${doc.getCurrentPageInfo().pageNumber}`;
+        doc.text(footerText, pageWidth / 2, footerY, { align: 'center' });
+      };
 
-    const allRegistrations = activities.flatMap(
-      (b) => b.registrationsList || []
-    );
-    addTable(t('registrations'), registrationColumns, allRegistrations);
-
-    const allTransactions = activities.flatMap((b) => b.transactionsList || []);
-    addTable(t('transactions'), transactionColumns, allTransactions);
-
-    doc.addPage();
-    doc.setFontSize(14);
-    doc.text(t('summary'), isRTL ? doc.internal.pageSize.width - 40 : 40, 40, {
-      align: isRTL ? 'right' : 'left'
-    });
-
-    const totalUsd = activities.reduce((s, b) => s + (b.totals?.usd || 0), 0);
-    const totalIqd = activities.reduce((s, b) => s + (b.totals?.iqd || 0), 0);
-    const outstandingUsd = activities.reduce(
-      (s, b) => s + (b.outstanding?.usd || 0),
-      0
-    );
-    const outstandingIqd = activities.reduce(
-      (s, b) => s + (b.outstanding?.iqd || 0),
-      0
-    );
-
-    autoTable(doc, {
-      body: [
-        [t('total_usd'), formatUSD(totalUsd)],
-        [t('total_iqd'), formatIQD(totalIqd)],
-        [t('outstanding_usd'), formatUSD(outstandingUsd)],
-        [t('outstanding_iqd'), formatIQD(outstandingIqd)]
-      ],
-      startY: 60,
-      theme: 'grid',
-      styles: {
-        font: 'Vazirmatn-Regular',
-        fontStyle: 'normal',
-        halign: isRTL ? 'right' : 'left'
+      // Add footer to all pages
+      const totalPages = doc.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        addFooter();
       }
-    });
 
-    doc.save(`customer_${customer?.id || 'transactions'}.pdf`);
+      // Save with better filename
+      const fileName = `customer_${customer?.id || 'unknown'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      // Success feedback
+      console.log('PDF generated successfully:', fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+
+      // Fallback: create simple PDF
+      try {
+        const fallbackDoc = new jsPDF();
+        fallbackDoc.setFont('helvetica');
+        fallbackDoc.text(
+          'Error generating detailed PDF. Please try again.',
+          20,
+          20
+        );
+        fallbackDoc.text(`Error: ${error.message}`, 20, 40);
+        fallbackDoc.save('error_report.pdf');
+      } catch (fallbackError) {
+        console.error('Fallback PDF generation also failed:', fallbackError);
+      }
+    }
   };
 
   const columns = [

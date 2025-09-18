@@ -709,6 +709,13 @@
   "unknown": "Unknown",
   "context_id": "Context ID",
   "search_customers": "Search Customers",
-  "customer_transactions": "customer_transactions",
-  "imports_and_transportation": "imports_and_transportation"
+  "customer_transactions": "Customer Transactions",
+  "imports_and_transportation": "Imports and Transportation",
+  "financial_summary": "Financial Summary",
+  "customer_information": "Customer Information",
+  "no_data_available": "No data available",
+  "unknown_customer": "Unknown Customer",
+  "detailed_report": "Detailed Report",
+  "generated_on": "Generated on",
+  "export_transactions": "Export Transactions"
 }
