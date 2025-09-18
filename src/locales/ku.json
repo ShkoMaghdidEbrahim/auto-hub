@@ -710,7 +710,6 @@
   "unknown": "نەناسراو",
   "context_id": "ناسنامەی ناوەڕۆک",
   "search_customers": "گەڕان بە دوای کڕیارەکان",
-<<<<<<< HEAD
   "vehicle_import_dashboard": "داشبۆردی هاوردەی سەیارە",
   "total_batches": "کۆی وەجبەکان",
   "transactions_trend": "ڕێچەی مامەڵەکان (مانگانە)",
@@ -742,15 +741,4 @@
   "large": "گەورە",
   "suv": "SUV",
   "truck": "لۆری"
-=======
-  "customer_transactions": "مامەڵەکانی کڕیار",
-  "imports_and_transportation": "هاوردە و گواستنەوە",
-  "financial_summary": "پوختەی دارایی",
-  "customer_information": "زانیاری کڕیار",
-  "no_data_available": "هیچ داتایەک بەردەست نییە",
-  "unknown_customer": "کڕیاری نەناسراو",
-  "detailed_report": "ڕاپۆرتی وردەکاری",
-  "generated_on": "دروستکراوە لە",
-  "export_transactions": "دەرکردنی مامەڵەکان"
->>>>>>> 3ed24449ca7be0887467fa901759c4b41901734e
 }

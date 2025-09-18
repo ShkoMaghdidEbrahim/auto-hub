@@ -709,7 +709,6 @@
   "unknown": "Unknown",
   "context_id": "Context ID",
   "search_customers": "Search Customers",
-<<<<<<< HEAD
   "vehicle_import_dashboard": "Vehicle Import Dashboard",
   "transactions_trend": "Transactions Trend (monthly)",
   "vehicle_size_distribution": "Vehicle Size Distribution",
@@ -741,15 +740,4 @@
   "large": "Large",
   "suv": "SUV",
   "truck": "Truck"
-=======
-  "customer_transactions": "Customer Transactions",
-  "imports_and_transportation": "Imports and Transportation",
-  "financial_summary": "Financial Summary",
-  "customer_information": "Customer Information",
-  "no_data_available": "No data available",
-  "unknown_customer": "Unknown Customer",
-  "detailed_report": "Detailed Report",
-  "generated_on": "Generated on",
-  "export_transactions": "Export Transactions"
->>>>>>> 3ed24449ca7be0887467fa901759c4b41901734e
 }
