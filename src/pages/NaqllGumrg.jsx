@@ -13,6 +13,7 @@ import {
   DatePicker,
   message
 } from 'antd';
+import dayjs from 'dayjs';
 import {
   EditOutlined,
   DeleteOutlined,
@@ -84,7 +85,7 @@ const NaqllGumrg = () => {
         (item) =>
           (typeof item.vin_number === 'string' &&
             item.vin_number.toLowerCase().includes(searchLower)) ||
-          (typeof item.customer?.full_name === 'string' && // Fixed: customer instead of customers
+          (typeof item.customer?.full_name === 'string' &&
             item.customer.full_name.toLowerCase().includes(searchLower)) ||
           (typeof item.batch?.name === 'string' &&
             item.batch.name.toLowerCase().includes(searchLower)) ||
@@ -100,7 +101,7 @@ const NaqllGumrg = () => {
     // Apply filters
     if (filters.customer) {
       filtered = filtered.filter(
-        (item) => item.customer?.id === filters.customer // Fixed: customer instead of customers
+        (item) => item.customer?.id === filters.customer
       );
     }
     if (filters.batch) {
@@ -120,7 +121,7 @@ const NaqllGumrg = () => {
   // Get unique values for filter options
   const uniqueCustomers = useMemo(() => {
     const customers = importTransportationInfo
-      .map((item) => item.customer) // Fixed: customer instead of customers
+      .map((item) => item.customer)
       .filter((customer) => customer)
       .reduce((acc, customer) => {
         if (!acc.find((c) => c.id === customer.id)) {
@@ -205,12 +206,29 @@ const NaqllGumrg = () => {
       currentLanguage
     );
     const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+
+    // Colors
+    const primaryColor = '#1890ff';
+    const lightGray = '#f5f5f5';
+    const darkGray = '#666666';
+
     let yPosition = 20;
+
+    // Add logo (if available)
+    try {
+      const logoImg = new Image();
+      logoImg.src = '/logo.png';
+      const logoX = isRTL ? pageWidth - 50 : 20;
+      doc.addImage(logoImg, 'PNG', logoX, 10, 30, 20);
+    } catch (error) {
+      console.log('Logo not found, continuing without logo');
+    }
 
     // Title
     doc.setFont(boldFont, 'bold');
     doc.setFontSize(20);
-    doc.setTextColor('#1890ff');
+    doc.setTextColor(primaryColor);
 
     doc.text(t('import_transportation_report'), pageWidth / 2, yPosition, {
       align: 'center'
@@ -220,7 +238,7 @@ const NaqllGumrg = () => {
     // Export date
     doc.setFont(font);
     doc.setFontSize(10);
-    doc.setTextColor('#666666');
+    doc.setTextColor(darkGray);
     const exportDate = new Date().toLocaleDateString();
     const dateAlign = isRTL ? 'left' : 'right';
     const dateX = isRTL ? 20 : pageWidth - 20;
@@ -246,7 +264,7 @@ const NaqllGumrg = () => {
 
       doc.setFont(font);
       doc.setFontSize(10);
-      doc.setTextColor('#666666');
+      doc.setTextColor(darkGray);
 
       if (searchTerm) {
         doc.text(`${t('search')}: ${searchTerm}`, filterX, yPosition, {
@@ -304,7 +322,7 @@ const NaqllGumrg = () => {
     // Prepare table data
     const tableData = dataToExport.map((item) => [
       item.vin_number || '',
-      item.customer?.full_name || t('no_customer'), // Fixed: customer instead of customers
+      item.customer?.full_name || t('no_customer'),
       item.batch?.name || t('no_batch'),
       item.car_name || '',
       item.car_model || '',
@@ -335,6 +353,10 @@ const NaqllGumrg = () => {
       t('created_at')
     ];
 
+    // Debug: Log column count
+    console.log('PDF Export - Headers count:', headers.length);
+    console.log('PDF Export - Sample data columns:', tableData[0]?.length || 0);
+
     // Generate table
     autoTable(doc, {
       head: [headers],
@@ -345,10 +367,11 @@ const NaqllGumrg = () => {
         cellPadding: 2,
         overflow: 'linebreak',
         halign: isRTL ? 'right' : 'left',
+        valign: 'middle',
         font: font
       },
       headStyles: {
-        fillColor: '#1890ff',
+        fillColor: primaryColor,
         textColor: '#fff',
         fontStyle: 'bold',
         fontSize: 8,
@@ -356,10 +379,27 @@ const NaqllGumrg = () => {
         halign: isRTL ? 'right' : 'left'
       },
       alternateRowStyles: {
-        fillColor: '#f5f5f5',
+        fillColor: lightGray,
         font: font
       },
-      margin: { left: 20, right: 20 }
+      margin: { left: 20, right: 20 },
+      tableWidth: 'auto',
+      showHead: 'everyPage',
+      columnStyles: {
+        0: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // VIN
+        1: { cellWidth: 30, font: font, halign: isRTL ? 'right' : 'left' }, // Customer
+        2: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // Batch
+        3: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' }, // Car name
+        4: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Model
+        5: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Color
+        6: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Import fee
+        7: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Import system fee
+        8: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Car COC fee
+        9: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Transportation fee
+        10: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Total USD
+        11: { cellWidth: 20, font: font, halign: isRTL ? 'right' : 'left' }, // Total IQD
+        12: { cellWidth: 25, font: font, halign: isRTL ? 'right' : 'left' } // Created at
+      }
     });
 
     // Generate filename
@@ -392,7 +432,7 @@ const NaqllGumrg = () => {
     },
     {
       title: t('customer_name'),
-      dataIndex: 'customer', // Fixed: customer instead of customers
+      dataIndex: 'customer',
       key: 'full_name',
       width: 120,
       render: (customer) => customer?.full_name || t('no_customer')
@@ -531,39 +571,9 @@ const NaqllGumrg = () => {
           marginBottom: '16px'
         }}
         variant={'borderless'}
+        key={'naqll-gumrg'}
       >
-        <Row gutter={[10, 16]}>
-          <Col span={24}>
-            <Row gutter={[10, 10]}>
-              <Col span={18}>
-                <Divider
-                  orientation={t('rtl') ? 'right' : 'left'}
-                  style={{
-                    fontSize: 24,
-                    margin: 0
-                  }}
-                  dashed={true}
-                >
-                  {t('naqll_gumrg')}
-                </Divider>
-              </Col>
-              <Col span={6}>
-                <Button
-                  block
-                  type="primary"
-                  onClick={() =>
-                    setAddAndUpdateModal({
-                      open: true,
-                      record: null
-                    })
-                  }
-                >
-                  {t('add_registration')}
-                </Button>
-              </Col>
-            </Row>
-          </Col>
-
+        <Row gutter={[10, 10]}>
           <Col span={24}>
             {/* Search and Filter Section */}
             <Card
@@ -573,8 +583,8 @@ const NaqllGumrg = () => {
                 borderRadius: 8
               }}
             >
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={6} lg={5}>
+              <Row gutter={[10, 10]}>
+                <Col xs={24} md={6}>
                   <Input
                     placeholder={t('search')}
                     prefix={<SearchOutlined />}
@@ -583,7 +593,7 @@ const NaqllGumrg = () => {
                     allowClear
                   />
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={5}>
+                <Col xs={24} md={6}>
                   <Select
                     placeholder={t('customer_name')}
                     value={filters.customer}
@@ -603,6 +613,9 @@ const NaqllGumrg = () => {
                       customerSearchLoading ? 'جاري البحث...' : 'لا توجد نتائج'
                     }
                     style={{ width: '100%' }}
+                    dropdownMatchSelectWidth={false}
+                    maxTagCount={1}
+                    listHeight={400}
                     optionLabelProp="label"
                   >
                     {(customerSearchResults.length > 0
@@ -625,7 +638,7 @@ const NaqllGumrg = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={5}>
+                <Col xs={24} md={6}>
                   <Select
                     placeholder={
                       filters.customer
@@ -645,6 +658,8 @@ const NaqllGumrg = () => {
                         .includes(input.toLowerCase())
                     }
                     style={{ width: '100%' }}
+                    maxTagCount={1}
+                    listHeight={400}
                   >
                     {uniqueBatches.slice(0, 10).map((batch) => (
                       <Select.Option key={batch.id} value={batch.id}>
@@ -653,7 +668,7 @@ const NaqllGumrg = () => {
                     ))}
                   </Select>
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={5}>
+                <Col xs={24} md={6}>
                   <DatePicker.RangePicker
                     placeholder={[t('start_date'), t('end_date')]}
                     value={filters.dateRange}
@@ -663,29 +678,42 @@ const NaqllGumrg = () => {
                     style={{ width: '100%' }}
                   />
                 </Col>
-                <Col xs={24} sm={12} md={6} lg={4}>
-                  <Row justify="end" gutter={[8, 8]}>
-                    <Col>
-                      <Button
-                        type="default"
-                        icon={<ClearOutlined />}
-                        onClick={clearFilters}
-                        size="middle"
-                      >
-                        {t('clear_filters')}
-                      </Button>
-                    </Col>
-                    <Col>
-                      <Button
-                        type="primary"
-                        icon={<FilePdfOutlined />}
-                        onClick={exportToPDF}
-                        size="middle"
-                      >
-                        {t('export_pdf')}
-                      </Button>
-                    </Col>
-                  </Row>
+                <Col xs={24} md={8}>
+                  <Button
+                    block
+                    type="default"
+                    icon={<ClearOutlined />}
+                    onClick={clearFilters}
+                    size="middle"
+                  >
+                    {t('clear_filters')}
+                  </Button>
+                </Col>
+                <Col xs={24} md={8}>
+                  <Button
+                    block
+                    type="primary"
+                    icon={<FilePdfOutlined />}
+                    onClick={exportToPDF}
+                    size="middle"
+                  >
+                    {t('export_pdf')}
+                  </Button>
+                </Col>
+
+                <Col xs={24} md={8}>
+                  <Button
+                    block
+                    type="primary"
+                    onClick={() =>
+                      setAddAndUpdateModal({
+                        open: true,
+                        record: null
+                      })
+                    }
+                  >
+                    {t('add_registration')}
+                  </Button>
                 </Col>
               </Row>
             </Card>
@@ -725,7 +753,6 @@ const NaqllGumrg = () => {
           onSuccess={() => {
             fetchData();
           }}
-          t={t}
         />
       )}
     </>
