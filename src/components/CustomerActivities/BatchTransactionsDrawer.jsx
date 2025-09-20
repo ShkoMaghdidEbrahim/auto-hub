@@ -157,7 +157,7 @@ const BatchTransactionsDrawer = ({ open, onClose, batch }) => {
     },
     {
       title: t('vehicle_size'),
-      dataIndex: 'vehicle_size_type',
+      dataIndex: 'vehicle_size_types',
       key: 'vehicle_size',
       width: 120,
       render: (vehicleSize) => vehicleSize?.name || t('no_size')
