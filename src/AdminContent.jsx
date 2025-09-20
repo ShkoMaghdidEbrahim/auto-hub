@@ -14,7 +14,7 @@ import useBackGesture from './configs/useBackGesture.js';
 import SiderComponent from './components/Layout/SiderComponent.jsx';
 import HeaderComponent from './components/Layout/HeaderComponent.jsx';
 import LoadingFallback from './components/App/LoadingFallback.jsx';
-import PageNotFound from './pages/PageNotFound.js';
+import PageNotFound from './pages/PageNotFound.jsx';
 const { Content } = Layout;
 
 function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
