@@ -52,16 +52,6 @@ export const useImportTransportationColumns = () => {
     { title: t('car_name'), dataIndex: 'car_name', key: 'car_name' },
     { title: t('car_model'), dataIndex: 'car_model', key: 'car_model' },
     { title: t('car_color'), dataIndex: 'car_color', key: 'car_color' },
-    {
-      title: t('vehicle_size'),
-      dataIndex: ['vehicle_size_types', 'name'],
-      key: 'vehicle_size'
-    },
-    {
-      title: t('number_of_cylinders'),
-      dataIndex: 'number_of_cylinders',
-      key: 'number_of_cylinders'
-    },
     { title: t('import_fee'), dataIndex: 'import_fee', key: 'import_fee' },
     {
       title: t('import_system_fee'),

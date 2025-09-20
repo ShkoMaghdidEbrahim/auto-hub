@@ -61,20 +61,6 @@ const BatchTransactionsDrawer = ({ open, onClose, batch }) => {
       width: 150
     },
     {
-      title: t('customer_name'),
-      dataIndex: 'customer',
-      key: 'full_name',
-      width: 120,
-      render: (customer) => customer?.full_name || t('no_customer')
-    },
-    {
-      title: t('batch_name'),
-      dataIndex: 'batch',
-      key: 'batch',
-      width: 120,
-      render: (batch) => batch?.name || t('no_batch')
-    },
-    {
       title: t('car_name'),
       dataIndex: 'car_name',
       key: 'car_name',
@@ -156,20 +142,6 @@ const BatchTransactionsDrawer = ({ open, onClose, batch }) => {
       dataIndex: 'vin_number',
       key: 'vin_number',
       width: 150
-    },
-    {
-      title: t('customer_name'),
-      dataIndex: 'customer',
-      key: 'full_name',
-      width: 120,
-      render: (customer) => customer?.full_name || t('no_customer')
-    },
-    {
-      title: t('batch_name'),
-      dataIndex: 'batch',
-      key: 'batch',
-      width: 120,
-      render: (batch) => batch?.name || t('no_batch')
     },
     {
       title: t('car_name'),
