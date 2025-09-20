@@ -13,9 +13,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 import { addTransaction } from '../../database/APIs/CustomerActivities';
+import { useNavigation } from 'react-router-dom';
 
 const RepaymentModal = ({ open, onClose, batches }) => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
 
   const [selectedBatch, setSelectedBatch] = useState(null);
   const selectedBatchObj =

@@ -750,5 +750,7 @@
   "generated_on": "Generated on",
   "export_transactions": "Export Transactions",
   "usd_to_iqd_rate": "USD to IQD Rate",
-  "arabic": "Arabic"
+  "arabic": "Arabic",
+  "pageNotFound": "Page Not Found",
+  "goHome": "Go Home"
 }

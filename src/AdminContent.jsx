@@ -14,6 +14,7 @@ import useBackGesture from './configs/useBackGesture.js';
 import SiderComponent from './components/Layout/SiderComponent.jsx';
 import HeaderComponent from './components/Layout/HeaderComponent.jsx';
 import LoadingFallback from './components/App/LoadingFallback.jsx';
+import PageNotFound from './pages/PageNotFound.js';
 const { Content } = Layout;
 
 function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
@@ -93,63 +94,10 @@ function AdminContent({ isDarkMode, setDarkMode, color, setColor, broken }) {
                   />
                 );
               })}
+
               <Route
                 path="*"
-                element={
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      flexDirection: 'column',
-                      height: '100%',
-                      fontSize: 24,
-                      fontWeight: 'bold',
-                      color: isDarkMode ? 'white' : 'black'
-                    }}
-                  >
-                    <img
-                      src="/404.png"
-                      alt="404"
-                      style={{
-                        width: '75%',
-                        height: '75%',
-                        objectFit: 'contain'
-                      }}
-                    />
-                    <div
-                      style={{
-                        position: 'relative',
-                        height: '25%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        flexDirection: 'column',
-                        gap: 20
-                      }}
-                    >
-                      <p
-                        style={{
-                          fontSize: 40,
-                          color: isDarkMode ? 'white' : 'black'
-                        }}
-                      >
-                        Page Not Found
-                      </p>
-
-                      <Button
-                        type="primary"
-                        size={'large'}
-                        onClick={() => {
-                          window.location.href = '/';
-                        }}
-                        block
-                      >
-                        Go Home
-                      </Button>
-                    </div>
-                  </div>
-                }
+                element={<PageNotFound isDarkMode={isDarkMode} />}
               />
             </Routes>
           </Content>

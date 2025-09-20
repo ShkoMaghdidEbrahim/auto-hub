@@ -751,5 +751,7 @@
   "generated_on": "دروستکراوە لە",
   "export_transactions": "دەرکردنی مامەڵەکان",
   "usd_to_iqd_rate": "نرخی دۆلار بۆ دینار",
-  "arabic": "عەرەبی"
+  "arabic": "عەرەبی",
+  "pageNotFound": "لاپەڕەکە نەدۆزرایەوە",
+  "goHome": "بگەڕێ بۆ ماڵەوە"
 }

@@ -8,11 +8,14 @@ import { ConfigProvider, Spin, theme, Layout, Grid } from 'antd';
 import { getDirection, translation } from './locales/i18n.js';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthGuard } from './configs/authGuard.jsx';
-import AdminContent from './AdminContent.jsx';
 import Login from './pages/Login.jsx';
 import { makeDeeper } from './configs/makeDeeper.js';
 import useLocalStorage from './database/useLocalStorage.js';
+
 const { useBreakpoint } = Grid;
+
+import AdminContent from './AdminContent.jsx';
+import DynamicReceipt from './pages/DynamicReceipt.jsx';
 
 const App = () => {
   const [colorLocalStorage] = useLocalStorage('darkMode', null);
@@ -92,18 +95,8 @@ const App = () => {
             >
               <Routes>
                 <Route
-                  path="*"
-                  element={
-                    <AuthGuard>
-                      <AdminContent
-                        isDarkMode={isDarkMode}
-                        setDarkMode={setDarkMode}
-                        color={color}
-                        setColor={setColor}
-                        broken={!broken.lg}
-                      />
-                    </AuthGuard>
-                  }
+                  path="/dynamic-receipt"
+                  element={<DynamicReceipt isDarkMode={isDarkMode} />}
                 />
                 <Route
                   path="/login"
@@ -115,6 +108,20 @@ const App = () => {
                       setColor={setColor}
                       broken={!broken.lg}
                     />
+                  }
+                />
+                <Route
+                  path="*"
+                  element={
+                    <AuthGuard>
+                      <AdminContent
+                        isDarkMode={isDarkMode}
+                        setDarkMode={setDarkMode}
+                        color={color}
+                        setColor={setColor}
+                        broken={!broken.lg}
+                      />
+                    </AuthGuard>
                   }
                 />
               </Routes>
